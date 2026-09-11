@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/DashboardLayoutV2";
+import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
 import { teamOverview, teamTasks } from "@/data/mockData";
 
