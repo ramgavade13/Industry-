@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/DashboardLayoutV2";
+import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
 import ChartWidget from "@/components/ChartWidget";
 import { fetchKPIs, fetchRevenueTrend, fetchRiskAlerts } from "@/lib/api";
