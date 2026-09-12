@@ -9,6 +9,8 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   ceo: [
     { href: "/dashboard/ceo", label: "Overview" },
     { href: "/productivity", label: "Team Productivity" },
+    { href: "/forecasting", label: "Forecasting" },
+    { href: "/recommendations", label: "AI Recommendations" },
   ],
   admin: [
     { href: "/dashboard/admin", label: "Overview" },
