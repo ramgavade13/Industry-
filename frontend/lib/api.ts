@@ -15,12 +15,6 @@ const USE_MOCK = true; // flip to false once the backend endpoints exist
 
 async function getJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
-<<<<<<< HEAD
-  if (!res.ok) throw new Error(`Request to ${path} failed: ${res.status}`);
-  return res.json();
-}
-
-=======
 
   if (!res.ok) {
     throw new Error(`Request to ${path} failed: ${res.status}`);
@@ -29,7 +23,6 @@ async function getJSON<T>(path: string): Promise<T> {
   return res.json();
 }
 
->>>>>>> origin/frontend-dashboard
 export async function fetchKPIs() {
   if (USE_MOCK) return kpiData;
   return getJSON<typeof kpiData>("/api/kpis/");
