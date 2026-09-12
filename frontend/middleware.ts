@@ -37,5 +37,6 @@ export const config = {
     "/forecasting/:path*",
     "/recommendations/:path*",
     "/reports/:path*",
+    "/chat/:path*",
   ],
 };
