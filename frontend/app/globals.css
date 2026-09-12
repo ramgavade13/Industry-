@@ -30,25 +30,67 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-.tabular-nums { font-variant-numeric: tabular-nums; }
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
 
 @keyframes rise-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-[data-animate-in] > * { animation: rise-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-[data-animate-in] > *:nth-child(1) { animation-delay: 0ms; }
-[data-animate-in] > *:nth-child(2) { animation-delay: 60ms; }
-[data-animate-in] > *:nth-child(3) { animation-delay: 120ms; }
-[data-animate-in] > *:nth-child(4) { animation-delay: 180ms; }
+
+[data-animate-in] > * {
+  animation: rise-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[data-animate-in] > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+[data-animate-in] > *:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+[data-animate-in] > *:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+[data-animate-in] > *:nth-child(4) {
+  animation-delay: 180ms;
+}
 
 @keyframes pulse-once {
-  0% { background-color: transparent; }
-  30% { background-color: color-mix(in srgb, var(--accent) 12%, transparent); }
-  100% { background-color: transparent; }
+  0% {
+    background-color: transparent;
+  }
+
+  30% {
+    background-color: color-mix(
+      in srgb,
+      var(--accent) 12%,
+      transparent
+    );
+  }
+
+  100% {
+    background-color: transparent;
+  }
 }
-.value-updated { animation: pulse-once 900ms ease-out; }
+
+.value-updated {
+  animation: pulse-once 900ms ease-out;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  [data-animate-in] > *, .value-updated { animation: none; }
+  [data-animate-in] > *,
+  .value-updated {
+    animation: none;
+  }
 }
