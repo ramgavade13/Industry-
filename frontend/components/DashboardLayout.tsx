@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { clearSession } from "@/lib/auth";
 
 export type Role = "ceo" | "admin" | "manager" | "employee";
 
@@ -45,7 +46,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const navItems = NAV_BY_ROLE[role];
+
+  function handleLogout() {
+    clearSession();
+    router.push("/login");
+  }
 
   return (
     <div className="min-h-screen bg-[#0F1420] text-[#E7E4DC] flex">
@@ -79,8 +86,16 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="px-6 py-4 border-t border-[#242B3D] text-xs text-[#5C6580]">
-          Logged in as {ROLE_LABEL[role]}
+        <div className="px-6 py-4 border-t border-[#242B3D]">
+          <div className="text-xs text-[#5C6580] mb-2">
+            Logged in as {ROLE_LABEL[role]}
+          </div>
+          <button
+            onClick={handleLogout}
+            className="text-xs text-[#8B93A7] hover:text-[#D65F5F] transition-colors"
+          >
+            Log out
+          </button>
         </div>
       </aside>
 
