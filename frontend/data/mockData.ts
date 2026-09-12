@@ -75,3 +75,57 @@ export const myStats = [
   { label: "Completed", value: "3", change: "", trend: "up" as const },
   { label: "Due This Week", value: "2", change: "", trend: "down" as const },
 ];
+
+// --- Forecasting ---
+export const revenueForecast = [
+  { month: "Sep", actual: 42.6, forecast: 42.6 },
+  { month: "Oct", actual: null, forecast: 46.2 },
+  { month: "Nov", actual: null, forecast: 49.8 },
+  { month: "Dec", actual: null, forecast: 55.1 },
+  { month: "Jan", actual: null, forecast: 52.4 },
+  { month: "Feb", actual: null, forecast: 57.9 },
+];
+
+export const forecastSummary = [
+  { label: "Next Month Revenue", value: "₹46.2L", change: "+8.4%", trend: "up" as const },
+  { label: "Next Quarter Revenue", value: "₹151.1L", change: "+12.1%", trend: "up" as const },
+  { label: "Projected Expenses", value: "₹19.8L", change: "+3.2%", trend: "down" as const },
+  { label: "Forecast Confidence", value: "84%", change: "+2pt", trend: "up" as const },
+];
+
+export const forecastNotes = [
+  { title: "Revenue growth expected to continue", detail: "Model projects steady growth into Q4, driven by the last two months' trend." },
+  { title: "Expense growth trailing revenue", detail: "Expenses are forecast to grow slower than revenue, improving margin over the next quarter." },
+  { title: "Watch: seasonal dip risk in January", detail: "Historical data shows a typical post-holiday dip — factored into the January estimate." },
+];
+
+// --- AI Recommendations ---
+export const aiRecommendations = [
+  {
+    id: "r1",
+    title: "Reallocate budget from Mobile App v2 to Client Portal Revamp",
+    problem: "Client Portal Revamp is at high risk of budget overrun; Mobile App v2 is under-spending against plan.",
+    evidence: "Portal project has used 92% of budget at 70% completion. Mobile App v2 has used 38% of budget at 45% completion.",
+    action: "Shift ₹4L from Mobile App v2's Q4 allocation to Client Portal Revamp.",
+    impact: "Reduces portal overrun risk from High to Medium; delays Mobile App v2 by an estimated 1 week.",
+    confidence: "High" as const,
+  },
+  {
+    id: "r2",
+    title: "Add one backend resource to Inventory Sync API",
+    problem: "Project flagged for resource shortage risk with 3 open blockers tied to backend capacity.",
+    evidence: "Backend team velocity dropped 22% over last 2 sprints; 2 of 3 blockers are backend-tagged.",
+    action: "Temporarily move 1 backend engineer from a lower-priority project for 2 sprints.",
+    impact: "Expected to clear current blockers and bring the project back on schedule.",
+    confidence: "Medium" as const,
+  },
+  {
+    id: "r3",
+    title: "Hold marketing spend increase this quarter",
+    problem: "Requested 15% increase in marketing spend does not show clear ROI in current KPI trends.",
+    evidence: "Lead conversion rate flat over last 3 months despite prior 10% spend increase.",
+    action: "Maintain current marketing budget; revisit after Q4 KPI review.",
+    impact: "Avoids ₹6L in low-confidence spend; frees budget for the portal project.",
+    confidence: "Medium" as const,
+  },
+];
