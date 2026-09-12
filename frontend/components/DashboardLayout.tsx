@@ -14,6 +14,7 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
     { href: "/recommendations", label: "AI Recommendations" },
     { href: "/reports", label: "Reports" },
     { href: "/chat", label: "Executive Chat" },
+    { href: "/voice", label: "Voice Assistant" },
   ],
   admin: [
     { href: "/dashboard/admin", label: "Overview" },
