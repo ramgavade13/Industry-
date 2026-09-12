@@ -38,5 +38,6 @@ export const config = {
     "/recommendations/:path*",
     "/reports/:path*",
     "/chat/:path*",
+    "/voice/:path*",
   ],
 };
