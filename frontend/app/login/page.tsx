@@ -1,73 +1,64 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
+    setError("");
+    // TODO: replace with a real call once Gayatri's Django auth API is ready
+    console.log("Login attempt:", { email });
+  }
+
   return (
-    <main className="min-h-screen bg-slate-100 px-6 py-12">
-      <div className="mx-auto max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">
-          Login
-        </h1>
+    <main className="flex min-h-screen items-center justify-center bg-[#0F1420] px-6 text-[#E7E4DC]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 blur-3xl"
+        style={{ background: "radial-gradient(closest-side, #C9A227, transparent)" }}
+      />
+      <div data-animate-in className="relative w-full max-w-sm rounded-lg border border-[#242B3D] bg-[#161C2C] p-8">
+        <div className="text-center">
+          <div className="text-[#C9A227] text-sm font-semibold">Industry</div>
+          <h1 className="mt-2 text-xl font-semibold">Welcome back</h1>
+          <p className="mt-1 text-sm text-[#8B93A7]">Sign in to your executive dashboard</p>
+        </div>
 
-        <p className="mt-2 text-slate-500">
-          Login to your AI Executive Decision Agent account.
-        </p>
-
-        <form className="mt-8 space-y-5">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Email
-            </label>
-
+            <label className="block text-xs text-[#8B93A7] mb-1.5">Email</label>
             <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+              type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
-
           <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Password
-            </label>
-
+            <label className="block text-xs text-[#8B93A7] mb-1.5">Password</label>
             <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+              type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500"
-          >
+          {error && <p className="text-xs text-[#D65F5F]">{error}</p>}
+          <button type="submit" className="w-full rounded-md bg-[#C9A227] py-2.5 text-sm font-semibold text-[#0F1420] transition-colors hover:bg-[#DDB646]">
             Login
           </button>
         </form>
 
-        <div className="mt-6 flex justify-between text-sm">
-          <Link
-            href="/"
-            className="text-slate-600 hover:text-blue-600"
-          >
-            Back to Home
-          </Link>
-
-          <Link
-            href="/signup"
-            className="font-semibold text-blue-600 hover:text-blue-500"
-          >
-            Create Account
-          </Link>
-        </div>
+        <p className="mt-6 text-center text-xs text-[#8B93A7]">
+          Don&apos;t have an account? <Link href="/signup" className="text-[#C9A227] hover:underline">Create one</Link>
+        </p>
       </div>
     </main>
   );
