@@ -1,107 +1,123 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+const ROLES = ["ceo", "admin", "manager", "employee"] as const;
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<(typeof ROLES)[number]>("employee");
+  const [error, setError] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name || !email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    setError("");
+
+    // TODO: replace with a real call once Gayatri's Django auth API is ready
+    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup/`, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ name, email, password, role }),
+    // });
+    // if (!res.ok) { setError("Something went wrong. Try again."); return; }
+
+    console.log("Signup attempt:", { name, email, role });
+
+    // Account created — send them to login instead of straight into a dashboard
+    router.push(`/login?email=${encodeURIComponent(email)}`);
+  }
+
   return (
-    <main className="min-h-screen bg-slate-100 px-6 py-12">
-      <div className="mx-auto max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">
-          Create Account
-        </h1>
+    <main className="flex min-h-screen items-center justify-center bg-[#0F1420] px-6 text-[#E7E4DC]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full opacity-15 blur-3xl"
+        style={{ background: "radial-gradient(closest-side, #C9A227, transparent)" }}
+      />
 
-        <p className="mt-2 text-slate-500">
-          Create your AI Executive Decision Agent account.
-        </p>
+      <div data-animate-in className="relative w-full max-w-sm rounded-lg border border-[#242B3D] bg-[#161C2C] p-8">
+        <div className="text-center">
+          <div className="text-[#C9A227] text-sm font-semibold">Industry</div>
+          <h1 className="mt-2 text-xl font-semibold">Create your account</h1>
+          <p className="mt-1 text-sm text-[#8B93A7]">
+            Get access to your executive dashboard
+          </p>
+        </div>
 
-        <form className="mt-8 space-y-5">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label
-              htmlFor="name"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Full Name
-            </label>
-
+            <label className="block text-xs text-[#8B93A7] mb-1.5">Full name</label>
             <input
-              id="name"
               type="text"
-              placeholder="Enter your full name"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ram Gavade"
+              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Email
-            </label>
-
+            <label className="block text-xs text-[#8B93A7] mb-1.5">Email</label>
             <input
-              id="email"
               type="email"
-              placeholder="Enter your email"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@company.com"
+              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Password
-            </label>
-
+            <label className="block text-xs text-[#8B93A7] mb-1.5">Password</label>
             <input
-              id="password"
               type="password"
-              placeholder="Create a password"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
 
           <div>
-            <label
-              htmlFor="role"
-              className="mb-2 block text-sm font-medium text-slate-700"
-            >
-              Role
-            </label>
-
+            <label className="block text-xs text-[#8B93A7] mb-1.5">Role</label>
             <select
-              id="role"
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-500"
-              defaultValue="employee"
+              value={role}
+              onChange={(e) => setRole(e.target.value as (typeof ROLES)[number])}
+              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             >
-              <option value="employee">Employee</option>
-              <option value="manager">Manager</option>
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
+          {error && <p className="text-xs text-[#D65F5F]">{error}</p>}
+
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500"
+            className="w-full rounded-md bg-[#C9A227] py-2.5 text-sm font-semibold text-[#0F1420] transition-colors hover:bg-[#DDB646]"
           >
-            Create Account
+            Create account
           </button>
         </form>
 
-        <div className="mt-6 flex justify-between text-sm">
-          <Link
-            href="/"
-            className="text-slate-600 hover:text-blue-600"
-          >
-            Back to Home
+        <p className="mt-6 text-center text-xs text-[#8B93A7]">
+          Already have an account?{" "}
+          <Link href="/login" className="text-[#C9A227] hover:underline">
+            Login
           </Link>
-
-          <Link
-            href="/login"
-            className="font-semibold text-blue-600 hover:text-blue-500"
-          >
-            Already have an account?
-          </Link>
-        </div>
+        </p>
       </div>
     </main>
   );
