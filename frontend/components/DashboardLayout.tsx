@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { clearSession } from "@/lib/auth";
+import PageTransition from "./PageTransition";
 
 export type Role = "ceo" | "admin" | "manager" | "employee";
 
@@ -76,13 +78,20 @@ export default function DashboardLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block rounded-md px-3 py-2 text-sm transition-colors ${
+                className={`relative block rounded-md px-3 py-2 text-sm transition-colors ${
                   active
-                    ? "bg-[#1B2233] text-[#E7E4DC] border-l-2 border-[#C9A227] pl-[10px]"
+                    ? "text-[#E7E4DC]"
                     : "text-[#8B93A7] hover:text-[#E7E4DC] hover:bg-[#161C2C]"
                 }`}
               >
-                {item.label}
+                {active && (
+                  <motion.div
+                    layoutId="active-nav-pill"
+                    className="absolute inset-0 bg-[#1B2233] border-l-2 border-[#C9A227] rounded-md"
+                    transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                  />
+                )}
+                <span className="relative pl-2">{item.label}</span>
               </Link>
             );
           })}
@@ -119,7 +128,9 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="flex-1 px-8 py-8">{children}</main>
+        <main className="flex-1 px-8 py-8">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
     </div>
   );
