@@ -1,3 +1,6 @@
 from django.urls import path
+from .views import RiskAlertListView
 
-urlpatterns = []
+urlpatterns = [
+    path("risks/", RiskAlertListView.as_view(), name="risk-list"),
+]
