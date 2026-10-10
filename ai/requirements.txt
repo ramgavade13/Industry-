@@ -1,6 +1,26 @@
-fastapi
-uvicorn
-pandas
-numpy
-scikit-learn
-python-dotenv
+# Data Processing
+pandas==2.2.2
+numpy==1.26.4
+
+# Machine Learning and Risk Prediction
+scikit-learn==1.5.0
+xgboost==2.0.3
+joblib==1.4.2
+
+# Generative AI and AI Agents
+google-generativeai==0.5.4
+langgraph==0.1.5
+langchain-core==0.2.9
+
+# Retrieval-Augmented Generation (RAG)
+chromadb==0.5.0
+
+# Voice Assistant
+openai-whisper==20231117
+gTTS==2.5.1
+SpeechRecognition
+pyttsx3
+
+# Environment Configuration
+python-dotenv==1.0.1
+
