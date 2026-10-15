@@ -16,7 +16,7 @@ export async function askExecutiveAssistant(question: string): Promise<string> {
     }
 
     const data = await res.json();
-    return data.reply ?? "The assistant returned an empty answer.";
+        return String(data.reply ?? "The assistant returned an empty answer.").replace(/\*\*/g, "");
   } catch {
     return "Cannot reach the server. Is the backend running?";
   }
