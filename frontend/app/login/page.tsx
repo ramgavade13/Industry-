@@ -14,33 +14,43 @@ function LoginForm() {
 
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<Role>("ceo");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
     setError("");
+    setLoading(true);
 
-    // TODO: replace with a real call once Gayatri's Django auth API is ready.
-    // The API should return the user's actual role — the dropdown below is
-    // only a stand-in until then, so the frontend can be tested end-to-end.
-    //
-    // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ email, password }),
-    // });
-    // if (!res.ok) { setError("Invalid email or password."); return; }
-    // const data = await res.json();
-    // router.push(`/dashboard/${data.role}`);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/accounts/login/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    console.log("Login attempt:", { email, role });
-    setSession(role);
-    router.push(`/dashboard/${role}`);
+      if (!res.ok) {
+        setError("Invalid email or password.");
+        return;
+      }
+
+      const data = await res.json();
+      if (!ROLES.includes(data.role)) {
+        setError("Your account has an unrecognised role. Contact an administrator.");
+        return;
+      }
+
+      setSession(data.role as Role, data.token, data.refresh, data.name);
+      router.push(`/dashboard/${data.role}`);
+    } catch {
+      setError("Cannot reach the server. Is the backend running?");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -55,16 +65,14 @@ function LoginForm() {
         <div className="text-center">
           <div className="text-[#C9A227] text-sm font-semibold">Industry</div>
           <h1 className="mt-2 text-xl font-semibold">Welcome back</h1>
-          <p className="mt-1 text-sm text-[#8B93A7]">
-            Sign in to your executive dashboard
-          </p>
+          <p className="mt-1 text-sm text-[#8B93A7]">Sign in to your executive dashboard</p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label className="block text-xs text-[#8B93A7] mb-1.5">Email</label>
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
@@ -83,31 +91,14 @@ function LoginForm() {
             />
           </div>
 
-          {/* Temporary until Gayatri's login API returns the real role */}
-          <div>
-            <label className="block text-xs text-[#8B93A7] mb-1.5">
-              Login as (temporary — backend will decide this later)
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as Role)}
-              className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
-            >
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r.charAt(0).toUpperCase() + r.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {error && <p className="text-xs text-[#D65F5F]">{error}</p>}
 
           <button
             type="submit"
-            className="w-full rounded-md bg-[#C9A227] py-2.5 text-sm font-semibold text-[#0F1420] transition-colors hover:bg-[#DDB646]"
+            disabled={loading}
+            className="w-full rounded-md bg-[#C9A227] py-2.5 text-sm font-semibold text-[#0F1420] transition-colors hover:bg-[#DDB646] disabled:opacity-60"
           >
-            Login
+            {loading ? "Signing in…" : "Login"}
           </button>
         </form>
 
