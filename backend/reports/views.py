@@ -1,5 +1,6 @@
 from django.http import HttpResponse, Http404
 from rest_framework.views import APIView
+from accounts.permissions import CEO_ONLY
 from .generators import (
     build_executive_pdf, build_kpi_pdf,
     build_financial_pdf, build_risk_pdf,
@@ -14,6 +15,8 @@ GENERATORS = {
 
 
 class ReportDownloadView(APIView):
+    permission_classes = [CEO_ONLY]
+
     def get(self, request, report_type):
         generator = GENERATORS.get(report_type)
         if not generator:

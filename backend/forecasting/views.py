@@ -1,22 +1,26 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from accounts.permissions import CEO_ONLY
 from .models import Forecast, ForecastNote
 from .serializers import ForecastSerializer, ForecastNoteSerializer
 
 
 class ForecastListView(ListAPIView):
+    permission_classes = [CEO_ONLY]
     queryset = Forecast.objects.all()
     serializer_class = ForecastSerializer
 
 
 class ForecastNoteListView(ListAPIView):
+    permission_classes = [CEO_ONLY]
     queryset = ForecastNote.objects.all()
     serializer_class = ForecastNoteSerializer
 
 
 class ForecastSummaryView(APIView):
     """Computed KPI-style summary, matching forecastSummary shape."""
+    permission_classes = [CEO_ONLY]
 
     def get(self, request):
         forecasts = Forecast.objects.exclude(actual__isnull=False).order_by("id")

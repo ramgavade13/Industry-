@@ -18,3 +18,18 @@ class IsManager(BasePermission):
 class IsCEO(BasePermission):
     def has_permission(self, request, view):
         return _has_role(request, "ceo")
+
+
+def roles_required(*roles):
+    """Build a permission class that allows only the given roles."""
+
+    class _RolePermission(BasePermission):
+        def has_permission(self, request, view):
+            user = request.user
+            return bool(user and user.is_authenticated and user.role in roles)
+
+    return _RolePermission
+
+
+CEO_ONLY = roles_required("ceo")
+CEO_OR_MANAGER = roles_required("ceo", "manager")
