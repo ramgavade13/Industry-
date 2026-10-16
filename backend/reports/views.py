@@ -1,6 +1,7 @@
 from django.http import HttpResponse, Http404
 from rest_framework.views import APIView
-from accounts.permissions import CEO_ONLY
+from rest_framework.response import Response
+from accounts.permissions import CEO_ADMIN_MANAGER
 from .generators import (
     build_executive_pdf, build_kpi_pdf,
     build_financial_pdf, build_risk_pdf,
@@ -15,12 +16,16 @@ GENERATORS = {
 
 
 class ReportDownloadView(APIView):
-    permission_classes = [CEO_ONLY]
+    permission_classes = [CEO_ADMIN_MANAGER]
 
     def get(self, request, report_type):
         generator = GENERATORS.get(report_type)
         if not generator:
             raise Http404("Unknown report type")
+
+        # Financials are confidential: managers may not download this one.
+        if report_type == "financial" and request.user.role not in ("ceo", "admin"):
+            return Response({"detail": "Not allowed."}, status=403)
 
         buffer = generator()
         response = HttpResponse(buffer, content_type="application/pdf")

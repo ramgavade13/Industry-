@@ -33,3 +33,6 @@ def roles_required(*roles):
 
 CEO_ONLY = roles_required("ceo")
 CEO_OR_MANAGER = roles_required("ceo", "manager")
+
+CEO_ADMIN = roles_required("ceo", "admin")
+CEO_ADMIN_MANAGER = roles_required("ceo", "admin", "manager")

@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import CEO_OR_MANAGER, IsManager
+from accounts.permissions import CEO_ADMIN_MANAGER, IsManager
 from .models import TeamProductivity, WorkloadItem, Task
 from .serializers import (
     TeamProductivitySerializer,
@@ -13,13 +13,13 @@ from .serializers import (
 
 
 class TeamProductivityListView(ListAPIView):
-    permission_classes = [CEO_OR_MANAGER]
+    permission_classes = [CEO_ADMIN_MANAGER]
     queryset = TeamProductivity.objects.all()
     serializer_class = TeamProductivitySerializer
 
 
 class WorkloadListView(ListAPIView):
-    permission_classes = [CEO_OR_MANAGER]
+    permission_classes = [CEO_ADMIN_MANAGER]
     queryset = WorkloadItem.objects.all()
     serializer_class = WorkloadItemSerializer
 

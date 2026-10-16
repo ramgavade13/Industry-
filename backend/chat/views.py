@@ -1,12 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from accounts.permissions import CEO_ONLY
+from accounts.permissions import CEO_ADMIN
 from .services import ask_executive_assistant
 
 
 class ChatView(APIView):
-    permission_classes = [CEO_ONLY]
+    permission_classes = [CEO_ADMIN]
 
     def post(self, request):
         message = request.data.get("message", "").strip()

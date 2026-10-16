@@ -4,12 +4,12 @@ from rest_framework import status
 from rest_framework.parsers import MultiPartParser
 from django.http import HttpResponse
 from urllib.parse import quote
-from accounts.permissions import CEO_ONLY
+from accounts.permissions import CEO_ADMIN
 from .services import voice_question_to_answer
 
 
 class VoiceQueryView(APIView):
-    permission_classes = [CEO_ONLY]
+    permission_classes = [CEO_ADMIN]
     parser_classes = [MultiPartParser]
 
     def post(self, request):
