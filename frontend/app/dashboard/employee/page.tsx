@@ -1,12 +1,17 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
-import { myStats, myTasks } from "@/data/mockData";
+import { fetchEmployeeStats, fetchEmployeeTasks } from "@/lib/api";
 
 const statusColor = {
   "On track": "text-[#3FA77C]", "At risk": "text-[#C9A227]", "Not started": "text-[#8B93A7]",
 };
 
-export default function EmployeeDashboardPage() {
+export default async function EmployeeDashboardPage() {
+  const [myStats, myTasks] = await Promise.all([
+    fetchEmployeeStats(),
+    fetchEmployeeTasks(),
+  ]);
+
   return (
     <DashboardLayout role="employee" title="My Dashboard" subtitle="Your assigned tasks and deadlines">
       <div data-animate-in className="grid grid-cols-1 sm:grid-cols-3 gap-4">
