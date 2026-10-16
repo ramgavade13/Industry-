@@ -1,3 +1,6 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import update_last_login
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -5,8 +8,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 
 from .permissions import IsAdmin
 from .serializers import (
@@ -54,6 +55,14 @@ class LoginView(TokenObtainPairView):
     """
     permission_classes = [AllowAny]
     serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                update_last_login(None, serializer.user)
+        return response
 
 
 class LogoutView(APIView):
@@ -152,3 +161,4 @@ class AdminUserRoleUpdateView(APIView):
             "message": f"Role for '{target_user.username}' successfully updated to '{new_role}'.",
             "user": UserSerializer(target_user).data,
         })
+

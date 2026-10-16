@@ -12,11 +12,12 @@ class ChatView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+
     def post(self, request):
         message = request.data.get("message", "").strip()
 
         if not message:
             return Response({"detail": "Message is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        reply = ask_executive_assistant(message)
+        reply = ask_executive_assistant(message, request.user)
         return Response({"reply": reply})

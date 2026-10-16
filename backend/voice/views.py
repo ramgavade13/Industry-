@@ -5,16 +5,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 from django.http import HttpResponse
 from urllib.parse import quote
+from accounts.permissions import CEO_ADMIN
 from .services import voice_question_to_answer
 
 
 class VoiceQueryView(APIView):
     """
     Voice Question and Answer endpoint.
-    Requires authenticated user with valid JWT bearer token.
+    Secured strictly for Executive (CEO) and Administrator access.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [CEO_ADMIN]
     parser_classes = [MultiPartParser]
+
 
     def post(self, request):
         audio_file = request.FILES.get("audio")

@@ -5,6 +5,14 @@ def is_authenticated_user(request):
     return bool(request.user and request.user.is_authenticated)
 
 
+def _has_role(request, role):
+    return bool(
+        is_authenticated_user(request) and (
+            getattr(request.user, "role", None) == role or getattr(request.user, "is_superuser", False)
+        )
+    )
+
+
 class IsCEO(BasePermission):
     """
     Allows access only to Executive (CEO) users or superusers.
@@ -12,11 +20,7 @@ class IsCEO(BasePermission):
     message = "Executive access required: Only the CEO can access this resource."
 
     def has_permission(self, request, view):
-        return bool(
-            is_authenticated_user(request) and (
-                getattr(request.user, "role", None) == "ceo" or request.user.is_superuser
-            )
-        )
+        return _has_role(request, "ceo")
 
 
 class IsAdmin(BasePermission):
@@ -26,11 +30,17 @@ class IsAdmin(BasePermission):
     message = "Administrator access required: Only administrators can access this resource."
 
     def has_permission(self, request, view):
-        return bool(
-            is_authenticated_user(request) and (
-                getattr(request.user, "role", None) == "admin" or request.user.is_superuser
-            )
-        )
+        return _has_role(request, "admin")
+
+
+class IsManager(BasePermission):
+    """
+    Allows access only to Manager users or superusers.
+    """
+    message = "Manager access required: Only managers can access this resource."
+
+    def has_permission(self, request, view):
+        return _has_role(request, "manager")
 
 
 class IsExecutiveOrAdmin(BasePermission):
@@ -43,21 +53,7 @@ class IsExecutiveOrAdmin(BasePermission):
     def has_permission(self, request, view):
         return bool(
             is_authenticated_user(request) and (
-                getattr(request.user, "role", None) in ["ceo", "admin"] or request.user.is_superuser
-            )
-        )
-
-
-class IsManager(BasePermission):
-    """
-    Allows access only to Manager users or superusers.
-    """
-    message = "Manager access required: Only managers can access this resource."
-
-    def has_permission(self, request, view):
-        return bool(
-            is_authenticated_user(request) and (
-                getattr(request.user, "role", None) == "manager" or request.user.is_superuser
+                getattr(request.user, "role", None) in ["ceo", "admin"] or getattr(request.user, "is_superuser", False)
             )
         )
 
@@ -72,7 +68,7 @@ class IsManagerOrAbove(BasePermission):
     def has_permission(self, request, view):
         return bool(
             is_authenticated_user(request) and (
-                getattr(request.user, "role", None) in ["ceo", "admin", "manager"] or request.user.is_superuser
+                getattr(request.user, "role", None) in ["ceo", "admin", "manager"] or getattr(request.user, "is_superuser", False)
             )
         )
 
@@ -88,8 +84,17 @@ def HasRole(*roles):
         def has_permission(self, request, view):
             return bool(
                 is_authenticated_user(request) and (
-                    getattr(request.user, "role", None) in roles or request.user.is_superuser
+                    getattr(request.user, "role", None) in roles or getattr(request.user, "is_superuser", False)
                 )
             )
 
     return _DynamicRolePermission
+
+
+roles_required = HasRole
+
+CEO_ONLY = roles_required("ceo")
+CEO_OR_MANAGER = roles_required("ceo", "manager")
+CEO_ADMIN = roles_required("ceo", "admin")
+CEO_ADMIN_MANAGER = roles_required("ceo", "admin", "manager")
+

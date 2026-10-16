@@ -38,7 +38,8 @@ class Command(BaseCommand):
         ceo = make_user("ceo_demo", "Rohan", "ceo@example.com", "ceo")
         admin = make_user("admin_demo", "System Admin", "admin@example.com", "admin", is_staff=True)
         manager = make_user("manager_demo", "Priya", "manager@example.com", "manager")
-        emp1 = make_user("employee_demo", "Amit", "employee@example.com", "employee")
+        emp_default = make_user("employee_demo", "Amit", "employee@example.com", "employee")
+        emp1 = make_user("amit_demo", "Amit", "amit@example.com", "employee")
         emp2 = make_user("sneha_demo", "Sneha", "sneha@example.com", "employee")
         emp3 = make_user("karan_demo", "Karan", "karan@example.com", "employee")
 
@@ -142,4 +143,6 @@ class Command(BaseCommand):
         self.stdout.write("  - Admin: admin_demo / admin@example.com (Role: admin) -> Access to Admin Management & Data")
         self.stdout.write("  - Manager: manager_demo / manager@example.com (Role: manager)")
         self.stdout.write("  - Employee: employee_demo / employee@example.com (Role: employee)")
+        self.stdout.write("  - Staff: amit_demo, sneha_demo, karan_demo")
         self.stdout.write("  Password for all accounts: Demo@1234")
+

@@ -5,6 +5,9 @@ from finance.models import KPI, RevenueMonth
 from risk.models import RiskAlert
 from productivity.models import TeamProductivity
 
+def clean(text):
+    # Helvetica has no rupee glyph, so print "Rs." instead of a black square
+    return str(text).replace("₹", "Rs. ")
 
 def add_header(p, title):
     p.setFillColorRGB(0.059, 0.078, 0.125)  # #0F1420
@@ -35,7 +38,7 @@ def build_executive_pdf():
     y -= 20
     p.setFont("Helvetica", 10)
     for k in KPI.objects.all():
-        p.drawString(50, y, f"- {k.label}: {k.value} ({k.change})")
+        p.drawString(50, y, clean(f"- {k.label}: {k.value} ({k.change})"))
         y -= 16
 
     y -= 15
@@ -63,7 +66,7 @@ def build_kpi_pdf():
     p.setFont("Helvetica", 10)
     for k in KPI.objects.all():
         p.drawString(50, y, f"{k.label}")
-        p.drawString(280, y, f"{k.value}")
+        p.drawString(280, y, clean(k.value))
         p.drawString(400, y, f"{k.change}")
         y -= 18
 

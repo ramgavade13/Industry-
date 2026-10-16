@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from accounts.permissions import IsExecutiveOrAdmin, IsManagerOrAbove
+from accounts.permissions import CEO_ADMIN, CEO_ADMIN_MANAGER, IsExecutiveOrAdmin, IsManagerOrAbove
 from .models import KPI, RevenueMonth
 from .serializers import KPISerializer, RevenueMonthSerializer
 from risk.models import RiskAlert
@@ -11,12 +11,13 @@ from recommendations.models import Recommendation
 from productivity.models import Task
 
 
+
 class KPIListView(ListAPIView):
     """
     KPI monitoring endpoint.
     Accessible to Managers, Executives (CEO), and Administrators.
     """
-    permission_classes = [IsAuthenticated, IsManagerOrAbove]
+    permission_classes = [CEO_ADMIN_MANAGER]
     queryset = KPI.objects.all()
     serializer_class = KPISerializer
 
@@ -26,9 +27,10 @@ class RevenueTrendView(ListAPIView):
     Confidential financial insights and monthly revenue/expenses trend.
     Secured strictly for Executive (CEO) and Administrator access.
     """
-    permission_classes = [IsAuthenticated, IsExecutiveOrAdmin]
+    permission_classes = [CEO_ADMIN]
     queryset = RevenueMonth.objects.all()
     serializer_class = RevenueMonthSerializer
+
 
 
 class ExecutiveAnalysisView(APIView):

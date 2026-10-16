@@ -2,8 +2,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
-from accounts.permissions import IsManagerOrAbove
+from accounts.permissions import CEO_ADMIN_MANAGER, IsManager
 from .models import TeamProductivity, WorkloadItem, Task
 from .serializers import (
     TeamProductivitySerializer,
@@ -18,7 +17,7 @@ class TeamProductivityListView(ListAPIView):
     Team productivity metrics.
     Accessible to Managers, Executives (CEO), and Administrators.
     """
-    permission_classes = [IsAuthenticated, IsManagerOrAbove]
+    permission_classes = [CEO_ADMIN_MANAGER]
     queryset = TeamProductivity.objects.all()
     serializer_class = TeamProductivitySerializer
 
@@ -28,7 +27,7 @@ class WorkloadListView(ListAPIView):
     Workload distribution across team members.
     Accessible to Managers, Executives (CEO), and Administrators.
     """
-    permission_classes = [IsAuthenticated, IsManagerOrAbove]
+    permission_classes = [CEO_ADMIN_MANAGER]
     queryset = WorkloadItem.objects.all()
     serializer_class = WorkloadItemSerializer
 
@@ -38,8 +37,9 @@ class ManagerTasksView(ListAPIView):
     Manager view of team tasks.
     Executives/Admins can view all tasks; Managers see their team tasks.
     """
-    permission_classes = [IsAuthenticated, IsManagerOrAbove]
+    permission_classes = [CEO_ADMIN_MANAGER]
     serializer_class = TeamTaskSerializer
+
 
     def get_queryset(self):
         if self.request.user.role in ["ceo", "admin"] or self.request.user.is_superuser:
@@ -64,7 +64,9 @@ class ManagerOverviewView(APIView):
     Manager summary KPI cards.
     Accessible to Managers, Executives (CEO), and Administrators.
     """
-    permission_classes = [IsAuthenticated, IsManagerOrAbove]
+    permission_classes = [CEO_ADMIN_MANAGER]
+
+
 
     def get(self, request):
         if request.user.role in ["ceo", "admin"] or request.user.is_superuser:

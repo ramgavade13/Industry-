@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
+from .admin_views import AdminStatsView, AdminUsersView
 from .views import (
     AdminUserListView,
     AdminUserRoleUpdateView,
@@ -21,7 +22,11 @@ urlpatterns = [
     path("me/", CurrentUserView.as_view(), name="current_user"),
     path("roles/", RolesListView.as_view(), name="roles_list"),
 
-    # Administrator user management
+    # Administrator user management (REST API)
     path("users/", AdminUserListView.as_view(), name="admin_users_list"),
     path("users/<int:pk>/role/", AdminUserRoleUpdateView.as_view(), name="admin_user_role_update"),
-]
+
+    # Admin dashboard specific views
+    path("admin/users/", AdminUsersView.as_view(), name="admin-users"),
+    path("admin/stats/", AdminStatsView.as_view(), name="admin-stats"),
+]

@@ -134,3 +134,4 @@ class UserRoleUpdateSerializer(serializers.Serializer):
     Serializer used by administrators to modify another user's assigned role.
     """
     role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
+
