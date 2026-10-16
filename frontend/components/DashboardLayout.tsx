@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { clearSession } from "@/lib/auth";
+import { clearSession, getRole } from "@/lib/auth";
 import PageTransition from "./PageTransition";
 
 export type Role = "ceo" | "admin" | "manager" | "employee";
 
+// Menus follow the SRS page-and-role table (Section 14).
 const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   ceo: [
     { href: "/dashboard/ceo", label: "Overview" },
@@ -19,15 +21,25 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
     { href: "/voice", label: "Voice Assistant" },
   ],
   admin: [
-    { href: "/dashboard/admin", label: "Overview" },
-    { href: "/dashboard/admin/users", label: "User Management" },
+    { href: "/dashboard/admin", label: "Overview & Users" },
+    { href: "/productivity", label: "Team Productivity" },
+    { href: "/forecasting", label: "Forecasting" },
+    { href: "/recommendations", label: "AI Recommendations" },
+    { href: "/reports", label: "Reports" },
+    { href: "/chat", label: "Executive Chat" },
+    { href: "/voice", label: "Voice Assistant" },
   ],
   manager: [
     { href: "/dashboard/manager", label: "My Team" },
     { href: "/productivity", label: "Team Productivity" },
+    { href: "/reports", label: "Reports" },
+    { href: "/chat", label: "Executive Chat" },
+    { href: "/voice", label: "Voice Assistant" },
   ],
   employee: [
     { href: "/dashboard/employee", label: "My Tasks" },
+    { href: "/chat", label: "Executive Chat" },
+    { href: "/voice", label: "Voice Assistant" },
   ],
 };
 
@@ -37,6 +49,8 @@ const ROLE_LABEL: Record<Role, string> = {
   manager: "Manager",
   employee: "Employee",
 };
+
+const noopSubscribe = () => () => {};
 
 export default function DashboardLayout({
   role,
@@ -51,7 +65,13 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const navItems = NAV_BY_ROLE[role];
+
+  // Use the logged-in user's real role (from the cookie); the `role` prop is only the
+  // fallback for the server render and for pages that don't know the role.
+  const cookieRole = useSyncExternalStore(noopSubscribe, () => getRole(), () => null);
+  const activeRole: Role =
+    cookieRole && cookieRole in NAV_BY_ROLE ? (cookieRole as Role) : role;
+  const navItems = NAV_BY_ROLE[activeRole];
 
   function handleLogout() {
     clearSession();
@@ -99,7 +119,7 @@ export default function DashboardLayout({
 
         <div className="px-6 py-4 border-t border-[#242B3D]">
           <div className="text-xs text-[#5C6580] mb-2">
-            Logged in as {ROLE_LABEL[role]}
+            Logged in as {ROLE_LABEL[activeRole]}
           </div>
           <button
             onClick={handleLogout}
