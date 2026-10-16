@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import {
   kpiData,
   revenueTrend,
@@ -11,16 +13,37 @@ import {
 } from "@/data/mockData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const USE_MOCK = true; // flip to false once the backend endpoints exist
+// Real backend data by default. Set NEXT_PUBLIC_USE_MOCK=true in .env.local to go back to mock data.
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+
+async function getToken(): Promise<string | null> {
+  const store = await cookies();
+  const raw = store.get("token")?.value;
+  if (!raw) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
 
 async function getJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
+  const token = await getToken();
+  const res = await fetch(`${API_URL}${path}`, {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  // Token missing or expired: send the user back to log in again.
+  if (res.status === 401) redirect("/login");
 
   if (!res.ok) {
     throw new Error(`Request to ${path} failed: ${res.status}`);
   }
 
-  return res.json();
+  const data = await res.json();
+  // Support paginated responses ({ results: [...] }) as well as plain lists.
+  return (Array.isArray(data?.results) ? data.results : data) as T;
 }
 
 export async function fetchKPIs() {
