@@ -1,10 +1,15 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
-import { systemStats, systemUsers } from "@/data/mockData";
+import { fetchAdminStats, fetchAdminUsers } from "@/lib/api";
 
 const statusColor = { Active: "text-[#3FA77C]", Inactive: "text-[#8B93A7]" };
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const [systemStats, systemUsers] = await Promise.all([
+    fetchAdminStats(),
+    fetchAdminUsers(),
+  ]);
+
   return (
     <DashboardLayout role="admin" title="Admin Dashboard" subtitle="Users, access, and system health">
       <div data-animate-in className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -28,8 +33,8 @@ export default function AdminDashboardPage() {
             </tr>
           </thead>
           <tbody>
-            {systemUsers.map((u) => (
-              <tr key={u.name} className="border-b border-[#242B3D] last:border-0">
+            {systemUsers.map((u, i) => (
+              <tr key={`${u.name}-${i}`} className="border-b border-[#242B3D] last:border-0">
                 <td className="px-5 py-3 text-[#E7E4DC]">{u.name}</td>
                 <td className="px-5 py-3 text-[#8B93A7]">{u.role}</td>
                 <td className={`px-5 py-3 font-medium ${statusColor[u.status]}`}>{u.status}</td>

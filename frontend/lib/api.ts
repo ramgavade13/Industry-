@@ -14,6 +14,8 @@ import {
   teamTasks,
   myStats,
   myTasks,
+  systemStats,
+  systemUsers,
 } from "@/data/mockData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -113,4 +115,14 @@ export async function fetchEmployeeStats() {
 export async function fetchEmployeeTasks() {
   if (USE_MOCK) return myTasks;
   return getJSON<typeof myTasks>("/api/employee/tasks/");
+}
+
+export async function fetchAdminStats() {
+  if (USE_MOCK) return systemStats;
+  return getJSON<typeof systemStats>("/api/accounts/admin/stats/");
+}
+
+export async function fetchAdminUsers() {
+  if (USE_MOCK) return systemUsers;
+  return getJSON<typeof systemUsers>("/api/accounts/admin/users/");
 }
