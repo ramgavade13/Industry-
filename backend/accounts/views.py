@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import update_last_login
 
 from .serializers import SignupSerializer
 
@@ -27,6 +28,7 @@ class LoginView(APIView):
             return Response({"detail": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
 
         refresh = RefreshToken.for_user(user)
+        update_last_login(None, user)
         return Response({
             "token": str(refresh.access_token),
             "refresh": str(refresh),
