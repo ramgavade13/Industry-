@@ -1,12 +1,17 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
-import { teamOverview, teamTasks } from "@/data/mockData";
+import { fetchManagerOverview, fetchManagerTasks } from "@/lib/api";
 
 const statusColor = {
   "On track": "text-[#3FA77C]", "At risk": "text-[#C9A227]", "Not started": "text-[#8B93A7]",
 };
 
-export default function ManagerDashboardPage() {
+export default async function ManagerDashboardPage() {
+  const [teamOverview, teamTasks] = await Promise.all([
+    fetchManagerOverview(),
+    fetchManagerTasks(),
+  ]);
+
   return (
     <DashboardLayout role="manager" title="Manager Dashboard" subtitle="Your team's progress this sprint">
       <div data-animate-in className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

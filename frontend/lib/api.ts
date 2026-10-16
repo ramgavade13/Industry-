@@ -10,6 +10,10 @@ import {
   forecastSummary,
   forecastNotes,
   aiRecommendations,
+  teamOverview,
+  teamTasks,
+  myStats,
+  myTasks,
 } from "@/data/mockData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -89,4 +93,24 @@ export async function fetchForecastNotes() {
 export async function fetchAIRecommendations() {
   if (USE_MOCK) return aiRecommendations;
   return getJSON<typeof aiRecommendations>("/api/recommendations/");
+}
+
+export async function fetchManagerOverview() {
+  if (USE_MOCK) return teamOverview;
+  return getJSON<typeof teamOverview>("/api/manager/overview/");
+}
+
+export async function fetchManagerTasks() {
+  if (USE_MOCK) return teamTasks;
+  return getJSON<typeof teamTasks>("/api/manager/tasks/");
+}
+
+export async function fetchEmployeeStats() {
+  if (USE_MOCK) return myStats;
+  return getJSON<typeof myStats>("/api/employee/stats/");
+}
+
+export async function fetchEmployeeTasks() {
+  if (USE_MOCK) return myTasks;
+  return getJSON<typeof myTasks>("/api/employee/tasks/");
 }
