@@ -1,17 +1,21 @@
 "use client";
 
-import { authHeaders } from "@/lib/auth";
+import { getFreshAuthHeaders } from "@/lib/auth";
 
 export type ReportType = "executive" | "kpi" | "financial" | "risk";
 
 export async function downloadReport(type: ReportType) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reports/${type}/`, {
-      headers: { ...authHeaders() },
+      headers: { ...(await getFreshAuthHeaders()) },
     });
 
     if (res.status === 401) {
       alert("Your session has expired. Please log in again.");
+      return;
+    }
+    if (res.status === 403) {
+      alert("You don't have permission to download this report.");
       return;
     }
     if (!res.ok) {
