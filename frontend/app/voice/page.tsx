@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { askExecutiveAssistant } from "@/lib/chatAssistant";
+import { getRole } from "@/lib/auth";
+import { getRoleContent } from "@/lib/roleContent";
 
 type Turn = { id: string; question: string; answer: string };
 type Status = "idle" | "listening" | "thinking" | "speaking" | "unsupported";
@@ -21,6 +23,8 @@ type SpeechRecognitionLike = {
   stop: () => void;
 };
 
+const noopSubscribe = () => () => {};
+
 // Remove markdown symbols so the answer is readable and the voice doesn't say "asterisk".
 function cleanText(text: string) {
   return text
@@ -31,6 +35,10 @@ function cleanText(text: string) {
 }
 
 export default function VoicePage() {
+  const role = useSyncExternalStore(noopSubscribe, () => getRole(), () => null);
+  const content = getRoleContent(role);
+  const hints = content.suggestions.slice(0, 2);
+
   const [status, setStatus] = useState<Status>("idle");
   const [transcript, setTranscript] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -173,9 +181,14 @@ export default function VoicePage() {
         )}
 
         <div className="mt-10 w-full max-w-2xl space-y-4">
-          {turns.length === 0 && status !== "unsupported" && (
+          {turns.length === 0 && status !== "unsupported" && hints.length > 0 && (
             <p className="text-center text-xs text-[#5C6580]">
-              Try: &ldquo;What are our current risks?&rdquo; or &ldquo;How is revenue trending?&rdquo;
+              Try: {hints.map((h, i) => (
+                <span key={h}>
+                  {i > 0 && " or "}
+                  &ldquo;{h}&rdquo;
+                </span>
+              ))}
             </p>
           )}
           {[...turns].reverse().map((t) => (
