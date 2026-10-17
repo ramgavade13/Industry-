@@ -2,6 +2,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from accounts.permissions import CEO_ADMIN
+from finance.models import RevenueMonth
+from .ml.summary import build_summary_cards
 from .models import Forecast, ForecastNote
 from .serializers import ForecastSerializer, ForecastNoteSerializer
 
@@ -19,36 +21,12 @@ class ForecastNoteListView(ListAPIView):
 
 
 class ForecastSummaryView(APIView):
-    """Computed KPI-style summary, matching forecastSummary shape."""
+    """The four summary cards, computed from the revenue history with the same
+    trend model that produces the forecast chart."""
     permission_classes = [CEO_ADMIN]
 
     def get(self, request):
-        forecasts = Forecast.objects.exclude(actual__isnull=False).order_by("id")
-        next_month = forecasts.first()
-
-        return Response([
-            {
-                "label": "Next Month Revenue",
-                "value": f"₹{next_month.forecast}L" if next_month else "—",
-                "change": "+8.4%",
-                "trend": "up",
-            },
-            {
-                "label": "Next Quarter Revenue",
-                "value": "₹151.1L",
-                "change": "+12.1%",
-                "trend": "up",
-            },
-            {
-                "label": "Projected Expenses",
-                "value": "₹19.8L",
-                "change": "+3.2%",
-                "trend": "down",
-            },
-            {
-                "label": "Forecast Confidence",
-                "value": "84%",
-                "change": "+2pt",
-                "trend": "up",
-            },
-        ])
+        history = list(RevenueMonth.objects.order_by("id"))
+        revenue = [h.revenue for h in history]
+        expenses = [h.expenses for h in history]
+        return Response(build_summary_cards(revenue, expenses))
