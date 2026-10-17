@@ -1,49 +1,164 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import update_last_login
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import update_last_login
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import SignupSerializer
+from .permissions import IsAdmin
+from .serializers import (
+    CustomTokenObtainPairSerializer,
+    SignupSerializer,
+    UserRoleUpdateSerializer,
+    UserSerializer,
+)
+
+User = get_user_model()
 
 
 class SignupView(APIView):
+    """
+    Public registration endpoint.
+    All self-registered users are assigned the 'employee' role.
+    """
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "Account created"}, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            return Response(
+                {
+                    "message": "Account created successfully.",
+                    "user": {
+                        "id": user.id,
+                        "email": user.email,
+                        "username": user.username,
+                        "role": user.role,
+                        "name": user.first_name or user.username,
+                    },
+                },
+                status=status.HTTP_201_CREATED,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-        user = authenticate(username=email, password=password)
+class LoginView(TokenObtainPairView):
+    """
+    JWT authentication endpoint.
+    Accepts either 'email' or 'username' alongside 'password'.
+    Returns signed access and refresh JWT tokens containing user role claims.
+    """
+    permission_classes = [AllowAny]
+    serializer_class = CustomTokenObtainPairSerializer
 
-        if user is None:
-            return Response({"detail": "Invalid email or password."}, status=status.HTTP_401_UNAUTHORIZED)
-
-        refresh = RefreshToken.for_user(user)
-        update_last_login(None, user)
-        return Response({
-            "token": str(refresh.access_token),
-            "refresh": str(refresh),
-            "role": user.role,
-            "name": user.first_name or user.username,
-        })
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                update_last_login(None, serializer.user)
+        return response
 
 
 class LogoutView(APIView):
+    """
+    Logout endpoint that invalidates and blacklists the refresh JWT token.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "Refresh token is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
-            token = RefreshToken(request.data["refresh"])
+            token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({"message": "Logged out"}, status=status.HTTP_205_RESET_CONTENT)
-        except Exception:
-            return Response({"detail": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Logged out successfully. Token blacklisted."},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": f"Invalid or expired refresh token: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class CurrentUserView(APIView):
+    """
+    Returns authenticated user profile, permissions, and executive/admin flags.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response({
+            "user": serializer.data,
+            "role": user.role,
+            "is_executive": user.role in ["ceo", "admin"] or user.is_superuser,
+            "is_admin": user.role == "admin" or user.is_superuser,
+            "is_manager": user.role in ["ceo", "admin", "manager"] or user.is_superuser,
+        })
+
+
+class RolesListView(APIView):
+    """
+    Returns available system roles for user assignment and dropdowns.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        roles = [{"value": code, "label": label} for code, label in User.ROLE_CHOICES]
+        return Response({"roles": roles})
+
+
+class AdminUserListView(ListAPIView):
+    """
+    Administrator endpoint: List all users in the system.
+    Restricted strictly to administrators (IsAdmin).
+    """
+    permission_classes = [IsAdmin]
+    queryset = User.objects.all().order_by("id")
+    serializer_class = UserSerializer
+
+
+class AdminUserRoleUpdateView(APIView):
+    """
+    Administrator endpoint: Update a user's assigned role.
+    Restricted strictly to administrators (IsAdmin).
+    """
+    permission_classes = [IsAdmin]
+
+    def patch(self, request, pk):
+        target_user = get_object_or_404(User, pk=pk)
+        serializer = UserRoleUpdateSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        new_role = serializer.validated_data["role"]
+
+        # Prevent an admin from accidentally locking themselves out
+        if target_user == request.user and new_role != "admin" and not request.user.is_superuser:
+            return Response(
+                {"detail": "Administrators cannot remove their own admin role."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        target_user.role = new_role
+        target_user.save(update_fields=["role"])
+
+        return Response({
+            "message": f"Role for '{target_user.username}' successfully updated to '{new_role}'.",
+            "user": UserSerializer(target_user).data,
+        })
+

@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser
 from django.http import HttpResponse
 from urllib.parse import quote
@@ -9,8 +10,13 @@ from .services import voice_question_to_answer
 
 
 class VoiceQueryView(APIView):
+    """
+    Voice Question and Answer endpoint.
+    Secured strictly for Executive (CEO) and Administrator access.
+    """
     permission_classes = [CEO_ADMIN]
     parser_classes = [MultiPartParser]
+
 
     def post(self, request):
         audio_file = request.FILES.get("audio")

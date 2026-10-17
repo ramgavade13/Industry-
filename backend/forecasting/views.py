@@ -9,12 +9,20 @@ from .serializers import ForecastSerializer, ForecastNoteSerializer
 
 
 class ForecastListView(ListAPIView):
+    """
+    Forecasting data endpoint.
+    Secured strictly for Executive (CEO) and Administrator access.
+    """
     permission_classes = [CEO_ADMIN]
     queryset = Forecast.objects.all()
     serializer_class = ForecastSerializer
 
 
 class ForecastNoteListView(ListAPIView):
+    """
+    Forecasting qualitative notes.
+    Secured strictly for Executive (CEO) and Administrator access.
+    """
     permission_classes = [CEO_ADMIN]
     queryset = ForecastNote.objects.all()
     serializer_class = ForecastNoteSerializer
@@ -24,6 +32,7 @@ class ForecastSummaryView(APIView):
     """The four summary cards, computed from the revenue history with the same
     trend model that produces the forecast chart."""
     permission_classes = [CEO_ADMIN]
+
 
     def get(self, request):
         history = list(RevenueMonth.objects.order_by("id"))

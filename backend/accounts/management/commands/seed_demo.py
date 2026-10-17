@@ -11,33 +11,53 @@ User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Fill the database with demo data (safe to run more than once)."
+    help = "Fill the database with demo accounts and data for Executive and Administrator testing."
 
     def handle(self, *args, **options):
-        # Wipe demo tables (users are kept)
-        for model in (KPI, RevenueMonth, Forecast, ForecastNote, Task,
-                      TeamProductivity, WorkloadItem, Recommendation, RiskAlert):
-            model.objects.all().delete()
-
-        # Users
-        def make_user(username, first, role):
+        # Users setup
+        def make_user(username, first, email, role, is_staff=False, is_superuser=False):
             user, created = User.objects.get_or_create(
                 username=username,
-                defaults={"first_name": first, "role": role,
-                          "email": f"{username}@example.com"},
+                defaults={
+                    "first_name": first,
+                    "email": email,
+                    "role": role,
+                    "is_staff": is_staff,
+                    "is_superuser": is_superuser,
+                },
             )
-            if created:
-                user.set_password("Demo@1234")
-                user.save()
+            user.role = role
+            user.is_staff = is_staff
+            user.is_superuser = is_superuser
+            user.email = email
+            user.first_name = first
+            user.set_password("Demo@1234")
+            user.save()
             return user
 
-        ceo = make_user("ceo_demo", "Rohan", "ceo")
-        manager = make_user("manager_demo", "Priya", "manager")
-        emp1 = make_user("amit_demo", "Amit", "employee")
-        emp2 = make_user("sneha_demo", "Sneha", "employee")
-        emp3 = make_user("karan_demo", "Karan", "employee")
+        ceo = make_user("ceo_demo", "Rohan", "ceo@example.com", "ceo")
+        admin = make_user("admin_demo", "System Admin", "admin@example.com", "admin", is_staff=True)
+        manager = make_user("manager_demo", "Priya", "manager@example.com", "manager")
+        emp_default = make_user("employee_demo", "Amit", "employee@example.com", "employee")
+        emp1 = make_user("amit_demo", "Amit", "amit@example.com", "employee")
+        emp2 = make_user("sneha_demo", "Sneha", "sneha@example.com", "employee")
+        emp3 = make_user("karan_demo", "Karan", "karan@example.com", "employee")
 
-        # Finance
+        # Clean demo data tables
+        for model in (
+            KPI,
+            RevenueMonth,
+            Forecast,
+            ForecastNote,
+            Task,
+            TeamProductivity,
+            WorkloadItem,
+            Recommendation,
+            RiskAlert,
+        ):
+            model.objects.all().delete()
+
+        # Finance & KPIs
         KPI.objects.bulk_create([
             KPI(label="Revenue", value="₹42.6L", change="+8.2%", trend="up"),
             KPI(label="Expenses", value="₹28.4L", change="+3.1%", trend="up"),
@@ -52,7 +72,7 @@ class Command(BaseCommand):
             for m, r, e in zip(months, revenue, expenses)
         ])
 
-        # Forecasting (actual is empty for future months)
+        # Forecasting
         Forecast.objects.bulk_create([
             Forecast(month="Jul", actual=38.4, forecast=37.9),
             Forecast(month="Aug", actual=40.2, forecast=40.0),
@@ -62,20 +82,24 @@ class Command(BaseCommand):
             Forecast(month="Dec", actual=None, forecast=48.2),
         ])
         ForecastNote.objects.bulk_create([
-            ForecastNote(title="Seasonal uplift expected",
-                         detail="Q4 revenue usually rises because of festival-season demand."),
-            ForecastNote(title="Forecast confidence",
-                         detail="Model error has stayed within 2% over the last three months."),
+            ForecastNote(
+                title="Seasonal uplift expected",
+                detail="Q4 revenue usually rises because of festival-season demand.",
+            ),
+            ForecastNote(
+                title="Forecast confidence",
+                detail="Model error has stayed within 2% over the last three months.",
+            ),
         ])
 
-        # Risk
+        # Risk Alerts
         RiskAlert.objects.bulk_create([
             RiskAlert(project="Mobile App Revamp", risk="Delivery delayed by two sprints", severity="high"),
             RiskAlert(project="Data Warehouse Migration", risk="Budget overrun of about 12%", severity="medium"),
             RiskAlert(project="Customer Portal", risk="Minor scope creep", severity="low"),
         ])
 
-        # Productivity
+        # Productivity & Tasks
         TeamProductivity.objects.bulk_create([
             TeamProductivity(team="Engineering", completed=42, pending=11),
             TeamProductivity(team="Sales", completed=35, pending=9),
@@ -93,7 +117,7 @@ class Command(BaseCommand):
             Task(assignee=emp3, manager=manager, task="Write test cases", due="Oct 18", status="Not started"),
         ])
 
-        # Recommendations
+        # AI Recommendations
         Recommendation.objects.bulk_create([
             Recommendation(
                 title="Reduce customer churn",
@@ -101,16 +125,24 @@ class Command(BaseCommand):
                 evidence="Support tickets about onboarding doubled in the last two months.",
                 action="Launch a guided onboarding program for new customers.",
                 impact="Could lower churn by about 1 percentage point within a quarter.",
-                confidence="High"),
+                confidence="High",
+            ),
             Recommendation(
                 title="Rebalance engineering workload",
                 problem="One project is two sprints behind schedule.",
                 evidence="Engineering has the most pending tasks of any team.",
                 action="Move two engineers from the portal project to the app revamp.",
                 impact="Likely to recover one sprint of delay.",
-                confidence="Medium"),
+                confidence="Medium",
+            ),
         ])
 
-        self.stdout.write(self.style.SUCCESS("Demo data created."))
-        self.stdout.write("Demo users: ceo_demo, manager_demo, amit_demo, sneha_demo, karan_demo")
-        self.stdout.write("Password for all demo users: Demo@1234")
+        self.stdout.write(self.style.SUCCESS("Demo database successfully initialized with JWT test users!"))
+        self.stdout.write(self.style.NOTICE("Users created:"))
+        self.stdout.write("  - CEO: ceo_demo / ceo@example.com (Role: ceo) -> Access to Executive & Confidential Data")
+        self.stdout.write("  - Admin: admin_demo / admin@example.com (Role: admin) -> Access to Admin Management & Data")
+        self.stdout.write("  - Manager: manager_demo / manager@example.com (Role: manager)")
+        self.stdout.write("  - Employee: employee_demo / employee@example.com (Role: employee)")
+        self.stdout.write("  - Staff: amit_demo, sneha_demo, karan_demo")
+        self.stdout.write("  Password for all accounts: Demo@1234")
+

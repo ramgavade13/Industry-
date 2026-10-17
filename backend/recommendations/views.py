@@ -5,6 +5,10 @@ from .serializers import RecommendationSerializer
 
 
 class RecommendationListView(ListAPIView):
-    permission_classes = [CEO_ADMIN]  # SRS Section 5 would also allow managers; Section 14 says no
+    """
+    AI Recommendations endpoint.
+    Secured strictly for Executive (CEO) and Administrator access.
+    """
+    permission_classes = [CEO_ADMIN]
     queryset = Recommendation.objects.all()
-    serializer_class = RecommendationSerializer
+    serializer_class = RecommendationSerializer

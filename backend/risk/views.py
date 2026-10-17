@@ -5,6 +5,10 @@ from .serializers import RiskAlertSerializer
 
 
 class RiskAlertListView(ListAPIView):
+    """
+    Risk monitoring and alert endpoint.
+    Accessible to Managers, Executives (CEO), and Administrators.
+    """
     permission_classes = [CEO_ADMIN_MANAGER]
     queryset = RiskAlert.objects.all()
-    serializer_class = RiskAlertSerializer
+    serializer_class = RiskAlertSerializer

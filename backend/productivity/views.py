@@ -13,26 +13,45 @@ from .serializers import (
 
 
 class TeamProductivityListView(ListAPIView):
+    """
+    Team productivity metrics.
+    Accessible to Managers, Executives (CEO), and Administrators.
+    """
     permission_classes = [CEO_ADMIN_MANAGER]
     queryset = TeamProductivity.objects.all()
     serializer_class = TeamProductivitySerializer
 
 
 class WorkloadListView(ListAPIView):
+    """
+    Workload distribution across team members.
+    Accessible to Managers, Executives (CEO), and Administrators.
+    """
     permission_classes = [CEO_ADMIN_MANAGER]
     queryset = WorkloadItem.objects.all()
     serializer_class = WorkloadItemSerializer
 
 
 class ManagerTasksView(ListAPIView):
-    permission_classes = [IsManager]
+    """
+    Manager view of team tasks.
+    Executives/Admins can view all tasks; Managers see their team tasks.
+    """
+    permission_classes = [CEO_ADMIN_MANAGER]
     serializer_class = TeamTaskSerializer
 
+
     def get_queryset(self):
+        if self.request.user.role in ["ceo", "admin"] or self.request.user.is_superuser:
+            return Task.objects.all()
         return Task.objects.filter(manager=self.request.user)
 
 
 class EmployeeTasksView(ListAPIView):
+    """
+    Employee personal task list.
+    Filtered strictly to tasks assigned to the authenticated user.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = MyTaskSerializer
 
@@ -41,10 +60,20 @@ class EmployeeTasksView(ListAPIView):
 
 
 class ManagerOverviewView(APIView):
-    permission_classes = [IsManager]
+    """
+    Manager summary KPI cards.
+    Accessible to Managers, Executives (CEO), and Administrators.
+    """
+    permission_classes = [CEO_ADMIN_MANAGER]
+
+
 
     def get(self, request):
-        team_tasks = Task.objects.filter(manager=request.user)
+        if request.user.role in ["ceo", "admin"] or request.user.is_superuser:
+            team_tasks = Task.objects.all()
+        else:
+            team_tasks = Task.objects.filter(manager=request.user)
+
         total = team_tasks.count()
         completed = team_tasks.filter(status="On track").count()
         blockers = team_tasks.filter(status="At risk").count()
@@ -59,6 +88,9 @@ class ManagerOverviewView(APIView):
 
 
 class EmployeeStatsView(APIView):
+    """
+    Employee personal task metrics.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
