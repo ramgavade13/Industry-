@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setSession } from "@/lib/auth";
 
@@ -12,10 +12,17 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [email, setEmail] = useState(searchParams.get("email") ?? "");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("ceo");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const emailParam = searchParams.get("email");
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +49,8 @@ function LoginForm() {
         return;
       } else {
         const data = await res.json().catch(() => null);
-        const errorMsg = data?.detail || "Invalid email or password.";
+        const detail = Array.isArray(data?.detail) ? data.detail[0] : data?.detail;
+        const errorMsg = detail || "Invalid email or password.";
         setError(errorMsg);
         return;
       }
@@ -71,7 +79,7 @@ function LoginForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4" suppressHydrationWarning>
           <div>
             <label className="block text-xs text-[#8B93A7] mb-1.5">Email</label>
             <input
@@ -79,6 +87,7 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
+              suppressHydrationWarning
               className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
@@ -90,6 +99,7 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              suppressHydrationWarning
               className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             />
           </div>
@@ -102,6 +112,7 @@ function LoginForm() {
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as Role)}
+              suppressHydrationWarning
               className="w-full rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
             >
               {ROLES.map((r) => (
@@ -112,10 +123,48 @@ function LoginForm() {
             </select>
           </div>
 
-          {error && <p className="text-xs text-[#D65F5F]">{error}</p>}
+          {/* Quick Demo Credentials Autofill */}
+          <div className="rounded-md border border-[#242B3D] bg-[#0F1420]/60 p-3">
+            <span className="block text-[11px] font-medium text-[#8B93A7] mb-2">
+              Demo Credentials (Click to fill):
+            </span>
+            <div className="grid grid-cols-2 gap-1.5">
+              {[
+                { role: "CEO", email: "ceo@example.com" },
+                { role: "Admin", email: "admin@example.com" },
+                { role: "Manager", email: "manager@example.com" },
+                { role: "Employee", email: "employee@example.com" },
+              ].map((item) => (
+                <button
+                  key={item.role}
+                  type="button"
+                  suppressHydrationWarning
+                  onClick={() => {
+                    setEmail(item.email);
+                    setPassword("Demo@1234");
+                    setError("");
+                  }}
+                  className="rounded border border-[#242B3D] bg-[#161C2C] px-2 py-1.5 text-left text-xs text-[#E7E4DC] hover:border-[#C9A227] hover:text-[#C9A227] transition-colors"
+                >
+                  <span className="font-semibold block text-[10px] text-[#C9A227]">{item.role}</span>
+                  <span className="block text-[11px] text-[#8B93A7] truncate">{item.email}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <div className="rounded-md border border-red-900/50 bg-red-950/30 p-2.5 text-xs text-[#E57373]">
+              <p className="font-medium">{error}</p>
+              <p className="mt-1 text-[11px] text-[#8B93A7]">
+                Note: Passwords are case-sensitive. Demo password is <span className="font-mono text-[#E7E4DC]">Demo@1234</span> (with a capital <span className="font-mono text-[#C9A227]">D</span>).
+              </p>
+            </div>
+          )}
 
           <button
             type="submit"
+            suppressHydrationWarning
             className="w-full rounded-md bg-[#C9A227] py-2.5 text-sm font-semibold text-[#0F1420] transition-colors hover:bg-[#DDB646]"
           >
             Login

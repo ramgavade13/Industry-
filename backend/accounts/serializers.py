@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -26,18 +27,32 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         )
 
         if not login_id:
-            raise serializers.ValidationError({
-                "detail": "Email or username is required."
-            })
+            raise AuthenticationFailed("Email or username is required.")
 
         login_id = str(login_id).strip()
-        # If user entered an email address or username, lookup the exact username
-        user_by_email = User.objects.filter(email__iexact=login_id).first()
-        if user_by_email:
-            attrs[self.username_field] = user_by_email.get_username()
-        else:
-            attrs[self.username_field] = login_id
+        # Lookup user by either email or username
+        user = (
+            User.objects.filter(email__iexact=login_id).first()
+            or User.objects.filter(username__iexact=login_id).first()
+        )
 
+        if not user:
+            raise AuthenticationFailed(
+                f"No account found with email or username '{login_id}'. Please check for typos, register on the signup page, or click a demo account."
+            )
+
+        if not user.is_active:
+            raise AuthenticationFailed(
+                f"The account '{login_id}' is deactivated. Please contact an administrator."
+            )
+
+        password = attrs.get("password") or self.initial_data.get("password")
+        if not user.check_password(password):
+            raise AuthenticationFailed(
+                f"Incorrect password for '{login_id}'. Note: Passwords are case-sensitive (e.g. Demo@1234 with capital 'D')."
+            )
+
+        attrs[self.username_field] = user.get_username()
         data = super().validate(attrs)
 
         # Response payload includes JWT tokens and profile metadata
