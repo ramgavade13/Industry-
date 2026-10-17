@@ -3,7 +3,17 @@ import type { NextRequest } from "next/server";
 
 const ROLES = ["ceo", "admin", "manager", "employee"];
 
-export function middleware(request: NextRequest) {
+// Which roles may open each shared page (SRS Section 14).
+const PAGE_ROLES: Record<string, string[]> = {
+  "/productivity": ["ceo", "admin", "manager"],
+  "/forecasting": ["ceo", "admin"],
+  "/recommendations": ["ceo", "admin"],
+  "/reports": ["ceo", "admin", "manager"],
+  "/chat": ROLES,
+  "/voice": ROLES,
+};
+
+export function proxy(request: NextRequest) {
   const role = request.cookies.get("role")?.value;
   const path = request.nextUrl.pathname;
 
@@ -23,6 +33,13 @@ export function middleware(request: NextRequest) {
   if (path.startsWith("/dashboard/")) {
     const requestedRole = path.split("/")[2];
     if (requestedRole && ROLES.includes(requestedRole) && requestedRole !== role) {
+      return NextResponse.redirect(new URL(`/dashboard/${role}`, request.url));
+    }
+  }
+
+  // Shared pages: only the roles the SRS allows
+  for (const [page, allowed] of Object.entries(PAGE_ROLES)) {
+    if ((path === page || path.startsWith(`${page}/`)) && !allowed.includes(role)) {
       return NextResponse.redirect(new URL(`/dashboard/${role}`, request.url));
     }
   }

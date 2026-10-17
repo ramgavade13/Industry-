@@ -2,44 +2,76 @@
 
 import type { Role } from "@/components/DashboardLayout";
 
-export function setSession(
-  role: Role,
-  token?: string,
-  refresh?: string,
-  name?: string
-) {
-  document.cookie = `role=${role}; path=/; max-age=86400; SameSite=Lax`;
-  if (token) {
-    document.cookie = `token=${token}; path=/; max-age=86400; SameSite=Lax`;
-  }
-  if (typeof window !== "undefined") {
-    try {
-      if (token) localStorage.setItem("access_token", token);
-      if (refresh) localStorage.setItem("refresh_token", refresh);
-      if (name) localStorage.setItem("user_name", name);
-      localStorage.setItem("user_role", role);
-    } catch {
-      // Ignore storage errors in restricted contexts
-    }
-  }
+function setCookie(name: string, value: string, maxAgeSeconds: number) {
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAgeSeconds}`;
+}
+
+function getCookie(name: string): string | null {
+  const match = document.cookie.split("; ").find((c) => c.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.split("=")[1]) : null;
+}
+
+export function setSession(role: Role, token?: string, refresh?: string, name?: string) {
+  setCookie("role", role, 60 * 60 * 24);
+  if (token) setCookie("token", token, 60 * 30);
+  if (refresh) setCookie("refresh", refresh, 60 * 60 * 24 * 7);
+  if (name) setCookie("name", name, 60 * 60 * 24);
 }
 
 export function clearSession() {
-  document.cookie = "role=; path=/; max-age=0";
-  document.cookie = "token=; path=/; max-age=0";
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("user_name");
-      localStorage.removeItem("user_role");
-    } catch {
-      // Ignore
-    }
+  for (const key of ["role", "token", "refresh", "name"]) {
+    document.cookie = `${key}=; path=/; max-age=0`;
   }
 }
 
-export function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("access_token");
+export function getToken(): string | null {
+  return getCookie("token");
+}
+
+export function getRole(): string | null {
+  return getCookie("role");
+}
+
+export function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export type RefreshResult = "ok" | "none" | "expired" | "error";
+
+// Swap the refresh token for a new access token.
+//  ok      = new access token saved
+//  none    = no refresh token stored (user is not logged in)
+//  expired = refresh token rejected, session cleared, user must log in again
+//  error   = server unreachable, nothing changed
+export async function refreshAccessToken(): Promise<RefreshResult> {
+  const refresh = getCookie("refresh");
+  if (!refresh) return "none";
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/accounts/token/refresh/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh }),
+    });
+
+    if (res.status === 401) {
+      clearSession();
+      return "expired";
+    }
+    if (!res.ok) return "error";
+
+    const data = await res.json();
+    setCookie("token", data.access, 60 * 30);
+    if (data.refresh) setCookie("refresh", data.refresh, 60 * 60 * 24 * 7);
+    return "ok";
+  } catch {
+    return "error";
+  }
+}
+
+// Like authHeaders(), but renews an expired access token first.
+export async function getFreshAuthHeaders(): Promise<Record<string, string>> {
+  if (!getToken()) await refreshAccessToken();
+  return authHeaders();
 }

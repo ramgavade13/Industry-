@@ -20,7 +20,7 @@ export default async function ForecastingPage() {
         <div className="lg:col-span-2">
           <ChartWidget
             title="Revenue Forecast"
-            subtitle="Actuals vs projected, next 5 months (₹ in lakhs)"
+            subtitle="Actuals vs projected, next 3 months (₹ in lakhs)"
             type="line"
             data={chartData as unknown as Record<string, string | number>[]}
             xKey="month"
