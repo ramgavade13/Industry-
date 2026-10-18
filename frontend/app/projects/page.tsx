@@ -1,5 +1,9 @@
+import { cookies } from "next/headers";
+import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
+import DeleteProjectButton from "@/components/DeleteProjectButton";
 import { fetchProjects } from "@/lib/api";
+import { deleteProject } from "./actions";
 
 const riskBadge: Record<string, string> = {
   high: "bg-[#D65F5F]/15 text-[#D65F5F] border-[#D65F5F]/40",
@@ -13,6 +17,13 @@ const STATUS_OPTIONS = [
   { value: "on_hold", label: "On hold" },
   { value: "completed", label: "Completed" },
 ];
+
+const MESSAGES: Record<string, { text: string; good: boolean }> = {
+  created: { text: "Project created.", good: true },
+  updated: { text: "Project updated.", good: true },
+  deleted: { text: "Project deleted.", good: true },
+  denied: { text: "You are not allowed to delete projects.", good: false },
+};
 
 function lakh(n: number) {
   return `₹${(n / 100000).toFixed(1)}L`;
@@ -30,10 +41,13 @@ function formatDate(value: string | null) {
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; msg?: string }>;
 }) {
-  const { q = "", status = "" } = await searchParams;
+  const { q = "", status = "", msg = "" } = await searchParams;
   const projects = await fetchProjects({ q, status });
+  const role = (await cookies()).get("role")?.value;
+  const canDelete = role === "ceo" || role === "admin";
+  const banner = MESSAGES[msg];
 
   return (
     <DashboardLayout
@@ -41,36 +55,57 @@ export default async function ProjectsPage({
       title="Projects"
       subtitle="Progress, budget and risk for every project"
     >
-      <form method="get" className="flex flex-wrap gap-3 mb-6">
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Search by project or team"
-          className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC] placeholder:text-[#5C6580] w-72"
-        />
-        <select
-          name="status"
-          defaultValue={status}
-          className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC]"
+      {banner && (
+        <div
+          className={`mb-5 rounded-md border px-4 py-3 text-sm ${
+            banner.good
+              ? "border-[#3FA77C]/40 bg-[#3FA77C]/10 text-[#3FA77C]"
+              : "border-[#D65F5F]/40 bg-[#D65F5F]/10 text-[#D65F5F]"
+          }`}
         >
-          {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
+          {banner.text}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+        <form method="get" className="flex flex-wrap gap-3">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Search by project or team"
+            className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC] placeholder:text-[#5C6580] w-72"
+          />
+          <select
+            name="status"
+            defaultValue={status}
+            className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC]"
+          >
+            {STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            className="bg-[#242B3D] text-[#E7E4DC] rounded-md px-4 py-2 text-sm font-medium"
+          >
+            Apply
+          </button>
+          {(q || status) && (
+            <Link href="/projects" className="px-2 py-2 text-sm text-[#8B93A7] hover:text-[#E7E4DC]">
+              Clear
+            </Link>
+          )}
+        </form>
+
+        <Link
+          href="/projects/new"
           className="bg-[#C9A227] text-[#0F1420] rounded-md px-4 py-2 text-sm font-medium"
         >
-          Apply
-        </button>
-        {(q || status) && (
-          <a href="/projects" className="px-2 py-2 text-sm text-[#8B93A7] hover:text-[#E7E4DC]">
-            Clear
-          </a>
-        )}
-      </form>
+          + Add project
+        </Link>
+      </div>
 
       <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-[#242B3D] flex items-baseline justify-between">
@@ -86,12 +121,13 @@ export default async function ProjectsPage({
               <th className="px-5 py-3 font-medium">Budget</th>
               <th className="px-5 py-3 font-medium">Deadline</th>
               <th className="px-5 py-3 font-medium">Risk</th>
+              <th className="px-5 py-3 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {projects.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-6 text-center text-[#8B93A7]">
+                <td colSpan={7} className="px-5 py-6 text-center text-[#8B93A7]">
                   No projects match your search.
                 </td>
               </tr>
@@ -134,6 +170,17 @@ export default async function ProjectsPage({
                   ) : (
                     <span className="text-xs text-[#3FA77C]">Low</span>
                   )}
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-4">
+                    <Link
+                      href={`/projects/${p.id}/edit`}
+                      className="text-xs text-[#C9A227] hover:text-[#E7E4DC] transition-colors"
+                    >
+                      Edit
+                    </Link>
+                    {canDelete && <DeleteProjectButton action={deleteProject.bind(null, p.id)} />}
+                  </div>
                 </td>
               </tr>
             ))}
