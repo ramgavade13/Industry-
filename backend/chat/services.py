@@ -8,6 +8,7 @@ from django.core.cache import cache
 from google.api_core import exceptions as gexc
 
 from finance.models import KPI, RevenueMonth
+from finance.kpi_cards import kpi_cards
 from risk.models import RiskAlert
 from productivity.models import TeamProductivity, Task
 from productivity.serializers import MyTaskSerializer
@@ -63,7 +64,7 @@ def build_business_context(user):
     sections = []
 
     if "kpis" in allowed:
-        text = "\n".join(f"- {k.label}: {k.value} ({k.change})" for k in KPI.objects.all())
+        text = "\n".join(f"- {k.label}: {k.value} ({k.change})" for k in kpi_cards())
         sections.append(f"KPIs:\n{text}")
 
     if "revenue" in allowed:
@@ -163,7 +164,7 @@ def _local_answer(question, user):
         return note + "Your tasks:\n" + "\n".join(lines)
 
     if "kpis" in allowed:
-        lines = [f"• {k.label}: {k.value} ({k.change})" for k in KPI.objects.all()]
+        lines = [f"• {k.label}: {k.value} ({k.change})" for k in kpi_cards()]
         return note + "Current KPIs:\n" + "\n".join(lines)
 
     return DENIED

@@ -2,6 +2,7 @@ from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from finance.models import KPI, RevenueMonth
+from finance.kpi_cards import kpi_cards
 from risk.models import RiskAlert
 from productivity.models import TeamProductivity
 
@@ -37,7 +38,7 @@ def build_executive_pdf():
     p.drawString(40, y, "Key Performance Indicators")
     y -= 20
     p.setFont("Helvetica", 10)
-    for k in KPI.objects.all():
+    for k in kpi_cards():
         p.drawString(50, y, clean(f"- {k.label}: {k.value} ({k.change})"))
         y -= 16
 
@@ -64,7 +65,7 @@ def build_kpi_pdf():
 
     y = 750
     p.setFont("Helvetica", 10)
-    for k in KPI.objects.all():
+    for k in kpi_cards():
         p.drawString(50, y, f"{k.label}")
         p.drawString(280, y, clean(k.value))
         p.drawString(400, y, f"{k.change}")
