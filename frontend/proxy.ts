@@ -6,6 +6,8 @@ const ROLES = ["ceo", "admin", "manager", "employee"];
 // Which roles may open each shared page (SRS Section 14).
 const PAGE_ROLES: Record<string, string[]> = {
   "/productivity": ["ceo", "admin", "manager"],
+  "/projects": ["ceo", "admin", "manager"],
+  "/risk": ["ceo", "admin", "manager"],
   "/forecasting": ["ceo", "admin"],
   "/recommendations": ["ceo", "admin"],
   "/reports": ["ceo", "admin", "manager"],
@@ -51,6 +53,8 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/productivity/:path*",
+    "/projects/:path*",
+    "/risk/:path*",
     "/forecasting/:path*",
     "/recommendations/:path*",
     "/reports/:path*",
