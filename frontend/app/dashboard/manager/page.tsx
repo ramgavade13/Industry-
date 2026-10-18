@@ -2,8 +2,15 @@ import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
 import { fetchManagerOverview, fetchManagerTasks } from "@/lib/api";
 
-const statusColor = {
-  "On track": "text-[#3FA77C]", "At risk": "text-[#C9A227]", "Not started": "text-[#8B93A7]",
+const statusColor: Record<string, string> = {
+  Completed: "text-[#3FA77C]",
+  "In Progress": "text-[#6C9BD2]",
+  "Not Started": "text-[#8B93A7]",
+  Delayed: "text-[#D65F5F]",
+  // older status names (still used by the sample data)
+  "On track": "text-[#3FA77C]",
+  "At risk": "text-[#C9A227]",
+  "Not started": "text-[#8B93A7]",
 };
 
 export default async function ManagerDashboardPage() {
@@ -37,7 +44,7 @@ export default async function ManagerDashboardPage() {
                 <td className="px-5 py-3 text-[#E7E4DC]">{t.member}</td>
                 <td className="px-5 py-3 text-[#8B93A7]">{t.task}</td>
                 <td className="px-5 py-3 text-[#8B93A7]">{t.due}</td>
-                <td className={`px-5 py-3 font-medium ${statusColor[t.status]}`}>{t.status}</td>
+                <td className={`px-5 py-3 font-medium ${statusColor[t.status] ?? "text-[#8B93A7]"}`}>{t.status}</td>
               </tr>
             ))}
           </tbody>
