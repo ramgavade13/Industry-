@@ -14,6 +14,7 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   ceo: [
     { href: "/dashboard/ceo", label: "Overview" },
     { href: "/projects", label: "Projects" },
+    { href: "/tasks", label: "Tasks" },
     { href: "/risk", label: "Risk" },
     { href: "/productivity", label: "Team Productivity" },
     { href: "/forecasting", label: "Forecasting" },
@@ -25,6 +26,7 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   admin: [
     { href: "/dashboard/admin", label: "Overview & Users" },
     { href: "/projects", label: "Projects" },
+    { href: "/tasks", label: "Tasks" },
     { href: "/risk", label: "Risk" },
     { href: "/productivity", label: "Team Productivity" },
     { href: "/forecasting", label: "Forecasting" },
@@ -36,6 +38,7 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   manager: [
     { href: "/dashboard/manager", label: "My Team" },
     { href: "/projects", label: "Projects" },
+    { href: "/tasks", label: "Tasks" },
     { href: "/risk", label: "Risk" },
     { href: "/productivity", label: "Team Productivity" },
     { href: "/reports", label: "Reports" },

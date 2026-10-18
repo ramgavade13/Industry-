@@ -7,6 +7,7 @@ const ROLES = ["ceo", "admin", "manager", "employee"];
 const PAGE_ROLES: Record<string, string[]> = {
   "/productivity": ["ceo", "admin", "manager"],
   "/projects": ["ceo", "admin", "manager"],
+  "/tasks": ["ceo", "admin", "manager"],
   "/risk": ["ceo", "admin", "manager"],
   "/forecasting": ["ceo", "admin"],
   "/recommendations": ["ceo", "admin"],
@@ -54,6 +55,7 @@ export const config = {
     "/dashboard/:path*",
     "/productivity/:path*",
     "/projects/:path*",
+    "/tasks/:path*",
     "/risk/:path*",
     "/forecasting/:path*",
     "/recommendations/:path*",
