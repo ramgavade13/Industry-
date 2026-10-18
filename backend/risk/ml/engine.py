@@ -1,9 +1,13 @@
 """
 Project risk prediction (FR-09), based on Pranav's risk_prediction module.
 
-Reads project and task data (CSV files in the ./data folder), builds the same 6
-features Pranav's model uses, trains a RandomForest classifier and predicts a
-Low / Medium / High risk level plus a 0-100 risk score for every project.
+Reads project and task data, builds the 6 features Pranav's model uses, trains a
+RandomForest classifier and predicts a Low / Medium / High risk level plus a
+0-100 risk score for every project.
+
+Where the data comes from:
+  1. the database (Project and Task tables) when projects exist there, and
+  2. the CSV files in ./data otherwise (a fallback so the model always runs).
 
 NOTE: there are no real "did the project finish late?" outcomes yet, so the
 training labels are derived from the same rule thresholds as Pranav's
@@ -15,6 +19,7 @@ the scikit-learn version installed in this backend.
 """
 
 import csv
+from datetime import date
 from pathlib import Path
 
 import joblib
@@ -42,8 +47,8 @@ def _read_csv(name):
         return list(csv.DictReader(f))
 
 
-def load_project_rows():
-    """One dict per project with the 6 model features."""
+def load_csv_rows():
+    """One dict per project from the CSV files."""
     projects = _read_csv("projects.csv")
     tasks = _read_csv("tasks.csv")
 
@@ -65,6 +70,7 @@ def load_project_rows():
         cost = float(p["actual_cost"])
         s = summary.get(pid, {"total": 0, "completed": 0, "delayed": 0})
         rows.append({
+            "pk": None,
             "project_id": pid,
             "project_name": p["project_name"].strip(),
             "budget_used_pct": round(cost / budget * 100, 1) if budget else 0.0,
@@ -75,6 +81,51 @@ def load_project_rows():
             "completion_rate_pct": round(s["completed"] / s["total"] * 100, 1) if s["total"] else 0.0,
         })
     return rows
+
+
+def load_db_rows():
+    """One dict per open project from the database (Project and Task tables)."""
+    from productivity.models import Project  # imported here so this file also runs without Django
+
+    today = date.today()
+    rows = []
+    for p in Project.objects.exclude(status="completed").prefetch_related("tasks"):
+        tasks = list(p.tasks.all())
+        total = len(tasks)
+        completed = sum(1 for t in tasks if t.status == "Completed")
+        delayed = sum(
+            1 for t in tasks
+            if t.status != "Completed"
+            and (t.status == "Delayed" or (t.due_date is not None and t.due_date < today))
+        )
+        budget, spent = float(p.budget), float(p.spent)
+        rows.append({
+            "pk": p.pk,
+            "project_id": f"P{p.pk:03d}",
+            "project_name": p.name,
+            "budget_used_pct": round(spent / budget * 100, 1) if budget else 0.0,
+            "progress": float(min(max(p.progress, 0), 100)),
+            "deadline_days": float((p.end_date - today).days) if p.end_date else 365.0,
+            "delayed_tasks": float(delayed),
+            "total_tasks": float(total),
+            "completion_rate_pct": round(completed / total * 100, 1) if total else 0.0,
+        })
+    return rows
+
+
+def load_rows_with_source():
+    """(rows, 'database' | 'csv'): the database when it has projects, else the CSV files."""
+    try:
+        rows = load_db_rows()
+        if rows:
+            return rows, "database"
+    except Exception:
+        pass  # no Django, or the tables are not ready yet
+    return load_csv_rows(), "csv"
+
+
+def load_project_rows():
+    return load_rows_with_source()[0]
 
 
 # ---------- rule thresholds (same as Pranav's predict.py) ----------
@@ -133,6 +184,8 @@ def load_or_train(rows, retrain=False):
 def analyze_projects(retrain=False):
     """Return one dict per project, highest risk first."""
     rows = load_project_rows()
+    if not rows:
+        return []
     model = load_or_train(rows, retrain=retrain)
 
     X = _matrix(rows)
@@ -145,6 +198,7 @@ def analyze_projects(retrain=False):
         by_class = dict(zip(classes, p))
         score = 100 * (by_class.get("High", 0.0) + 0.5 * by_class.get("Medium", 0.0))
         results.append({
+            "pk": row["pk"],
             "project_id": row["project_id"],
             "project_name": row["project_name"],
             "risk_level": str(level),

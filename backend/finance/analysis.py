@@ -86,7 +86,7 @@ def _productivity_report():
         "total_tasks": total,
         "completed_tasks": done,
         "incomplete_tasks": total - done,
-        "delayed_tasks": Task.objects.filter(status="At risk").count(),  # tasks marked At risk
+        "delayed_tasks": Task.objects.filter(status="Delayed").count(),  # tasks marked At risk
         "completion_rate_percent": round(done / total * 100, 1),
         "teams": [
             {

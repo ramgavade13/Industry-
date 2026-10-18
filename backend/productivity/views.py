@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,6 +12,13 @@ from .serializers import (
     TeamTaskSerializer,
     MyTaskSerializer,
 )
+
+
+def _team_tasks_for(user):
+    """Executives and admins see every task; a manager sees the tasks of their own team."""
+    if user.role in ["ceo", "admin"] or user.is_superuser:
+        return Task.objects.all()
+    return Task.objects.filter(manager=user)
 
 
 class TeamProductivityListView(ListAPIView):
@@ -40,11 +49,12 @@ class ManagerTasksView(ListAPIView):
     permission_classes = [CEO_ADMIN_MANAGER]
     serializer_class = TeamTaskSerializer
 
-
     def get_queryset(self):
-        if self.request.user.role in ["ceo", "admin"] or self.request.user.is_superuser:
-            return Task.objects.all()
-        return Task.objects.filter(manager=self.request.user)
+        return (
+            _team_tasks_for(self.request.user)
+            .select_related("assignee", "project")
+            .order_by("due_date", "id")
+        )
 
 
 class EmployeeTasksView(ListAPIView):
@@ -56,34 +66,47 @@ class EmployeeTasksView(ListAPIView):
     serializer_class = MyTaskSerializer
 
     def get_queryset(self):
-        return Task.objects.filter(assignee=self.request.user)
+        return (
+            Task.objects.filter(assignee=self.request.user)
+            .select_related("project")
+            .order_by("due_date", "id")
+        )
 
 
 class ManagerOverviewView(APIView):
     """
-    Manager summary KPI cards.
+    Manager summary KPI cards, calculated from the task table.
     Accessible to Managers, Executives (CEO), and Administrators.
     """
     permission_classes = [CEO_ADMIN_MANAGER]
 
-
-
     def get(self, request):
-        if request.user.role in ["ceo", "admin"] or request.user.is_superuser:
-            team_tasks = Task.objects.all()
-        else:
-            team_tasks = Task.objects.filter(manager=request.user)
+        tasks = _team_tasks_for(request.user)
+        today = date.today()
 
-        total = team_tasks.count()
-        completed = team_tasks.filter(status="On track").count()
-        blockers = team_tasks.filter(status="At risk").count()
+        total = tasks.count()
+        members = tasks.values("assignee").distinct().count()
+        completed = tasks.filter(status="Completed").count()
+        delayed = tasks.filter(status="Delayed").count()
         percent = round((completed / total) * 100) if total else 0
 
+        upcoming = (
+            tasks.exclude(status="Completed")
+            .filter(due_date__gte=today)
+            .order_by("due_date")
+            .first()
+        )
+        if upcoming:
+            days = (upcoming.due_date - today).days
+            next_deadline = "Today" if days == 0 else f"{days} day{'s' if days != 1 else ''}"
+        else:
+            next_deadline = "None"
+
         return Response([
-            {"label": "Team Size", "value": str(total), "change": "", "trend": "up"},
+            {"label": "Team Size", "value": str(members), "change": "", "trend": "up"},
             {"label": "Tasks Completed", "value": f"{percent}%", "change": "", "trend": "up"},
-            {"label": "Open Blockers", "value": str(blockers), "change": "", "trend": "down"},
-            {"label": "Sprint Deadline", "value": "3 days", "change": "", "trend": "down"},
+            {"label": "Delayed Tasks", "value": str(delayed), "change": "", "trend": "down"},
+            {"label": "Next Deadline", "value": next_deadline, "change": "", "trend": "down"},
         ])
 
 
@@ -94,13 +117,17 @@ class EmployeeStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        my_tasks = Task.objects.filter(assignee=request.user)
-        total = my_tasks.count()
-        completed = my_tasks.filter(status="On track").count()
-        due_soon = my_tasks.exclude(status="On track").count()
+        mine = Task.objects.filter(assignee=request.user)
+        total = mine.count()
+        completed = mine.filter(status="Completed").count()
+        due_this_week = (
+            mine.exclude(status="Completed")
+            .filter(due_date__lte=date.today() + timedelta(days=7))
+            .count()
+        )
 
         return Response([
             {"label": "Tasks Assigned", "value": str(total), "change": "", "trend": "up"},
             {"label": "Completed", "value": str(completed), "change": "", "trend": "up"},
-            {"label": "Due This Week", "value": str(due_soon), "change": "", "trend": "down"},
+            {"label": "Due This Week", "value": str(due_this_week), "change": "", "trend": "down"},
         ])

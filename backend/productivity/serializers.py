@@ -16,13 +16,22 @@ class WorkloadItemSerializer(serializers.ModelSerializer):
 
 class TeamTaskSerializer(serializers.ModelSerializer):
     member = serializers.CharField(source="assignee.first_name")
+    project = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = ["member", "task", "due", "status"]
+        fields = ["member", "task", "due", "status", "priority", "project"]
+
+    def get_project(self, obj):
+        return obj.project.name if obj.project else ""
 
 
 class MyTaskSerializer(serializers.ModelSerializer):
+    project = serializers.SerializerMethodField()
+
     class Meta:
         model = Task
-        fields = ["task", "due", "status"]
+        fields = ["task", "due", "status", "priority", "project"]
+
+    def get_project(self, obj):
+        return obj.project.name if obj.project else ""
