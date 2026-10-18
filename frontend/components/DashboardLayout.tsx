@@ -13,6 +13,8 @@ export type Role = "ceo" | "admin" | "manager" | "employee";
 const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   ceo: [
     { href: "/dashboard/ceo", label: "Overview" },
+    { href: "/projects", label: "Projects" },
+    { href: "/risk", label: "Risk" },
     { href: "/productivity", label: "Team Productivity" },
     { href: "/forecasting", label: "Forecasting" },
     { href: "/recommendations", label: "AI Recommendations" },
@@ -22,6 +24,8 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   ],
   admin: [
     { href: "/dashboard/admin", label: "Overview & Users" },
+    { href: "/projects", label: "Projects" },
+    { href: "/risk", label: "Risk" },
     { href: "/productivity", label: "Team Productivity" },
     { href: "/forecasting", label: "Forecasting" },
     { href: "/recommendations", label: "AI Recommendations" },
@@ -31,6 +35,8 @@ const NAV_BY_ROLE: Record<Role, { href: string; label: string }[]> = {
   ],
   manager: [
     { href: "/dashboard/manager", label: "My Team" },
+    { href: "/projects", label: "Projects" },
+    { href: "/risk", label: "Risk" },
     { href: "/productivity", label: "Team Productivity" },
     { href: "/reports", label: "Reports" },
     { href: "/chat", label: "Executive Chat" },

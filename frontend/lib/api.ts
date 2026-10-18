@@ -126,3 +126,44 @@ export async function fetchAdminUsers() {
   if (USE_MOCK) return systemUsers;
   return getJSON<typeof systemUsers>("/api/accounts/admin/users/");
 }
+
+// ---- Projects and detailed risk (no mock data for these) ----
+
+export type RiskDetail = {
+  project: string;
+  risk: string;
+  severity: string;
+  score: number | null;
+  progress: number | null;
+  budget_used_pct: number | null;
+};
+
+export type ProjectRow = {
+  id: number;
+  name: string;
+  status: string;
+  progress: number;
+  team: string;
+  team_size: number;
+  budget: number;
+  spent: number;
+  budget_used_pct: number;
+  end_date: string | null;
+  days_left: number | null;
+  manager: string;
+  risk: string;
+};
+
+export async function fetchRiskDetails(): Promise<RiskDetail[]> {
+  if (USE_MOCK) return [];
+  return getJSON<RiskDetail[]>("/api/risks/");
+}
+
+export async function fetchProjects(filters: { q?: string; status?: string } = {}): Promise<ProjectRow[]> {
+  if (USE_MOCK) return [];
+  const params = new URLSearchParams();
+  if (filters.q) params.set("q", filters.q);
+  if (filters.status) params.set("status", filters.status);
+  const query = params.toString();
+  return getJSON<ProjectRow[]>(`/api/projects/${query ? `?${query}` : ""}`);
+}
