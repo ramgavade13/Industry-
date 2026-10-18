@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 
+from finance.kpis import KPIListView
+
 
 def root_health_view(request):
     """
@@ -36,6 +38,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/accounts/", include("accounts.urls")),
     path("api/auth/", include("accounts.urls")),
+    path("api/kpis/", KPIListView.as_view(), name="kpis"),
     path("api/tasks/", include("productivity.task_urls")),
     path("api/projects/", include("productivity.project_urls")),
     path("api/", include("finance.urls")),
