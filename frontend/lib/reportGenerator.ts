@@ -3,10 +3,12 @@
 import { getFreshAuthHeaders } from "@/lib/auth";
 
 export type ReportType = "executive" | "kpi" | "financial" | "risk";
+export type ReportFormat = "pdf" | "docx";
 
-export async function downloadReport(type: ReportType) {
+export async function downloadReport(type: ReportType, format: ReportFormat = "pdf") {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reports/${type}/`, {
+    const query = format === "docx" ? "?output=docx" : "";
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reports/${type}/${query}`, {
       headers: { ...(await getFreshAuthHeaders()) },
     });
 
@@ -27,7 +29,7 @@ export async function downloadReport(type: ReportType) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${type}-report.pdf`;
+    a.download = `${type}-report.${format}`;
     document.body.appendChild(a);
     a.click();
     a.remove();
