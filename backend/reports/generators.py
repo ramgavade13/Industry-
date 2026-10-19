@@ -124,7 +124,7 @@ def build_risk_pdf():
     y -= 20
     p.setFont("Helvetica", 10)
     for pr in TeamProductivity.objects.all():
-        p.drawString(50, y, f"{pr.team}: {pr.completed}% completed, {pr.pending}% pending")
+        p.drawString(50, y, f"{pr.team}: {pr.completed} tasks completed, {pr.pending} pending")
         y -= 16
 
     add_footer(p)
