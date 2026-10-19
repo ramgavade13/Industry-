@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.http import JsonResponse
 
 from finance.kpis import KPIListView
+from productivity.team_api import TeamListView
 
 
 def root_health_view(request):
@@ -18,11 +19,13 @@ def root_health_view(request):
             "auth_signup": "/api/accounts/signup/",
             "auth_token_refresh": "/api/accounts/token/refresh/",
             "auth_me": "/api/accounts/me/",
+            "auth_profile": "/api/accounts/me/profile/",
             "financials_trend": "/api/financials/trend/",
             "kpis": "/api/kpis/",
             "risks": "/api/risks/",
             "projects": "/api/projects/",
             "tasks": "/api/tasks/",
+            "teams": "/api/teams/",
             "forecasting": "/api/forecast/revenue/",
             "recommendations": "/api/recommendations/",
             "reports": "/api/reports/<type>/",
@@ -39,6 +42,7 @@ urlpatterns = [
     path("api/accounts/", include("accounts.urls")),
     path("api/auth/", include("accounts.urls")),
     path("api/kpis/", KPIListView.as_view(), name="kpis"),
+    path("api/teams/", TeamListView.as_view(), name="teams"),
     path("api/tasks/", include("productivity.task_urls")),
     path("api/projects/", include("productivity.project_urls")),
     path("api/", include("finance.urls")),
