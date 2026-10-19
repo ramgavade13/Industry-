@@ -2,22 +2,22 @@
 
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { downloadReport, ReportType } from "@/lib/reportGenerator";
+import { downloadReport, ReportFormat, ReportType } from "@/lib/reportGenerator";
 
 const REPORTS: { type: ReportType; title: string; description: string }[] = [
   { type: "executive", title: "Executive Summary Report", description: "KPIs and risk alerts in one page — for a quick leadership review." },
   { type: "kpi", title: "KPI Report", description: "All tracked KPIs with current values and trend direction." },
-  { type: "financial", title: "Financial Report", description: "Monthly revenue vs expenses over the last 6 months." },
+  { type: "financial", title: "Financial Report", description: "Monthly revenue, expenses and profit over the last 6 months." },
   { type: "risk", title: "Risk Report", description: "Flagged project risks alongside team productivity snapshot." },
 ];
 
 export default function ReportsPage() {
-  const [generating, setGenerating] = useState<ReportType | null>(null);
+  const [generating, setGenerating] = useState<string | null>(null);
 
-  async function handleDownload(type: ReportType) {
-    setGenerating(type);
+  async function handleDownload(type: ReportType, format: ReportFormat) {
+    setGenerating(`${type}-${format}`);
     try {
-      await downloadReport(type);
+      await downloadReport(type, format);
     } finally {
       setGenerating(null);
     }
@@ -32,21 +32,29 @@ export default function ReportsPage() {
               <h3 className="text-sm font-semibold text-[#E7E4DC]">{r.title}</h3>
               <p className="text-xs text-[#8B93A7] mt-2 leading-5">{r.description}</p>
             </div>
-            <button
-              onClick={() => handleDownload(r.type)}
-              disabled={generating === r.type}
-              className="mt-5 w-full rounded-md bg-[#C9A227] text-[#0F1420] text-sm font-semibold py-2.5 transition-colors hover:bg-[#DDB646] disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {generating === r.type ? "Generating…" : "Download PDF"}
-            </button>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <button
+                onClick={() => handleDownload(r.type, "pdf")}
+                disabled={generating !== null}
+                className="rounded-md bg-[#C9A227] text-[#0F1420] text-sm font-semibold py-2.5 transition-colors hover:bg-[#DDB646] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {generating === `${r.type}-pdf` ? "Generating…" : "Download PDF"}
+              </button>
+              <button
+                onClick={() => handleDownload(r.type, "docx")}
+                disabled={generating !== null}
+                className="rounded-md border border-[#C9A227] text-[#C9A227] text-sm font-semibold py-2.5 transition-colors hover:bg-[#C9A227]/10 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {generating === `${r.type}-docx` ? "Generating…" : "Download Word"}
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
       <p className="mt-6 text-xs text-[#5C6580]">
-        Reports are generated from current mock data. Once Gayatri&apos;s report
-        endpoint is live, these buttons will fetch the real PDF/DOCX from the
-        backend instead.
+        Reports are generated from the live data in the system. The Executive and Financial
+        reports are available to the CEO and Administrator only.
       </p>
     </DashboardLayout>
   );
