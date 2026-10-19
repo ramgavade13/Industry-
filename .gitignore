@@ -16,3 +16,4 @@ ai-backup/
 node_modules/
 .next/
 .env*.local
+ai/chroma_db/
