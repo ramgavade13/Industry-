@@ -82,7 +82,7 @@ def build_business_context(user):
 
     if "productivity" in allowed:
         text = "\n".join(
-            f"- {p.team}: {p.completed}% completed, {p.pending}% pending"
+            f"- {p.team}: {p.completed} tasks completed, {p.pending} pending"
             for p in TeamProductivity.objects.all()
         )
         sections.append(f"Team productivity:\n{text}")
@@ -153,7 +153,7 @@ def _local_answer(question, user):
         if "productivity" not in allowed:
             return DENIED
         teams = TeamProductivity.objects.all()
-        lines = [f"• {p.team}: {p.completed}% completed, {p.pending}% pending" for p in teams]
+        lines = [f"• {p.team}: {p.completed} tasks completed, {p.pending} pending" for p in teams]
         return note + "Team productivity:\n" + "\n".join(lines)
 
     if _role_of(user) == "employee":
