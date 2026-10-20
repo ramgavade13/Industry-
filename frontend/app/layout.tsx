@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/plus-jakarta-sans";
+import "@fontsource-variable/inter";
 import "./globals.css";
 import BusinessScene from "@/components/three/BusinessScene";
 import SessionKeeper from "@/components/SessionKeeper";
