@@ -2,15 +2,16 @@ import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
 import { fetchManagerOverview, fetchManagerTasks } from "@/lib/api";
 
-const statusColor: Record<string, string> = {
-  Completed: "text-[#3FA77C]",
-  "In Progress": "text-[#6C9BD2]",
-  "Not Started": "text-[#8B93A7]",
-  Delayed: "text-[#D65F5F]",
+// Maps task status to badge classes using design tokens
+const statusBadge: Record<string, string> = {
+  Completed: "badge-low",
+  "In Progress": "bg-secondary-subtle text-secondary border border-secondary-border",
+  "Not Started": "bg-surface-subtle text-muted border border-border",
+  Delayed: "badge-high",
   // older status names (still used by the sample data)
-  "On track": "text-[#3FA77C]",
-  "At risk": "text-[#C9A227]",
-  "Not started": "text-[#8B93A7]",
+  "On track": "badge-low",
+  "At risk": "badge-medium",
+  "Not started": "bg-surface-subtle text-muted border border-border",
 };
 
 export default async function ManagerDashboardPage() {
@@ -25,30 +26,36 @@ export default async function ManagerDashboardPage() {
         {teamOverview.map((s) => <KPICard key={s.label} {...s} />)}
       </div>
 
-      <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg mt-6 overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#242B3D]">
-          <h3 className="text-sm font-semibold text-[#E7E4DC]">Team Tasks</h3>
+      <div className="card rounded-xl mt-6 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-semibold text-ink">Team Tasks</h3>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs text-[#8B93A7] border-b border-[#242B3D]">
-              <th className="px-5 py-3 font-medium">Member</th>
-              <th className="px-5 py-3 font-medium">Task</th>
-              <th className="px-5 py-3 font-medium">Due</th>
-              <th className="px-5 py-3 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {teamTasks.map((t) => (
-              <tr key={t.task} className="border-b border-[#242B3D] last:border-0">
-                <td className="px-5 py-3 text-[#E7E4DC]">{t.member}</td>
-                <td className="px-5 py-3 text-[#8B93A7]">{t.task}</td>
-                <td className="px-5 py-3 text-[#8B93A7]">{t.due}</td>
-                <td className={`px-5 py-3 font-medium ${statusColor[t.status] ?? "text-[#8B93A7]"}`}>{t.status}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-muted border-b border-border bg-surface-subtle">
+                <th className="px-5 py-3 font-semibold">Member</th>
+                <th className="px-5 py-3 font-semibold">Task</th>
+                <th className="px-5 py-3 font-semibold">Due</th>
+                <th className="px-5 py-3 font-semibold">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {teamTasks.map((t) => (
+                <tr key={t.task} className="border-b border-border last:border-0 hover:bg-surface-subtle transition-colors">
+                  <td className="px-5 py-3 text-ink font-medium">{t.member}</td>
+                  <td className="px-5 py-3 text-muted">{t.task}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums">{t.due}</td>
+                  <td className="px-5 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusBadge[t.status] ?? "bg-surface-subtle text-muted border border-border"}`}>
+                      {t.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </DashboardLayout>
   );
