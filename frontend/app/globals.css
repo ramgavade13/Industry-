@@ -276,13 +276,76 @@ h1, h2, h3, h4, h5, h6, .font-display {
   animation: pulse-once 900ms ease-out;
 }
 
+/* Standout Hero Keyframe Animations (CSS only) */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes sparkline-dash {
+  0% {
+    stroke-dashoffset: 240;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -240;
+  }
+}
+
+.animate-float {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 6.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 7s ease-in-out infinite;
+}
+
+.animate-sparkline {
+  stroke-dasharray: 240;
+  animation: sparkline-dash 3.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-animate-in] > *,
   .value-updated,
   .card,
   .card-glow,
   .glass-card,
-  .btn-brand {
+  .btn-brand,
+  .animate-float,
+  .animate-float-reverse,
+  .animate-pulse-glow,
+  .animate-sparkline {
     animation: none !important;
     transition: none !important;
     transform: none !important;
