@@ -5,9 +5,9 @@ import type { DecisionStatus, RecommendationRow } from "@/lib/recommendationType
 import { formatDateTime } from "@/lib/userTypes";
 
 const confidenceColor: Record<string, string> = {
-  High: "bg-[#3FA77C]/15 text-[#3FA77C] border-[#3FA77C]/30",
-  Medium: "bg-[#C9A227]/15 text-[#C9A227] border-[#C9A227]/30",
-  Low: "bg-[#8B93A7]/15 text-[#8B93A7] border-[#8B93A7]/30",
+  High: "bg-success-subtle text-success border-success-border",
+  Medium: "bg-warning-subtle text-warning border-warning-border",
+  Low: "bg-slate-100 text-slate-700 border-slate-300",
 };
 
 export default function RecommendationsList({
@@ -30,7 +30,10 @@ export default function RecommendationsList({
 
   if (recommendations.length === 0) {
     return (
-      <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg px-6 py-6 text-sm text-[#8B93A7]">
+      <div className="card rounded-2xl px-6 py-10 text-center text-sm text-muted bg-surface border border-border shadow-card">
+        <svg className="w-8 h-8 text-muted/60 mx-auto mb-2" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
         No recommendations here.
       </div>
     );
@@ -52,16 +55,16 @@ export default function RecommendationsList({
           return (
             <div
               key={rec.id}
-              className="bg-[#161C2C] border border-[#242B3D] rounded-lg px-6 py-4 opacity-70 flex items-center justify-between gap-4"
+              className="card rounded-xl px-6 py-4 bg-surface-subtle/80 border border-border opacity-75 flex items-center justify-between gap-4 shadow-sm"
             >
               <div>
-                <div className="text-sm text-[#8B93A7]">{rec.title}</div>
-                <div className="text-xs text-[#5C6580] mt-1">{decidedLine}</div>
+                <div className="text-sm font-semibold text-muted line-through">{rec.title}</div>
+                <div className="text-xs text-muted/80 mt-0.5">{decidedLine}</div>
               </div>
               <button
                 disabled={busy}
                 onClick={() => decide(rec.id, "New")}
-                className="shrink-0 text-xs text-[#C9A227] hover:text-[#E7E4DC] transition-colors disabled:opacity-50"
+                className="shrink-0 text-xs font-semibold text-brand hover:text-brand-hover hover:underline transition-colors disabled:opacity-50"
               >
                 {busy ? "Saving…" : "Undo"}
               </button>
@@ -72,20 +75,22 @@ export default function RecommendationsList({
         return (
           <div
             key={rec.id}
-            className={`bg-[#161C2C] border rounded-lg px-6 py-6 transition-colors ${
-              rec.status === "Accepted" ? "border-[#3FA77C]/40" : "border-[#242B3D]"
+            className={`card rounded-2xl px-6 py-6 transition-all bg-surface border shadow-card hover:shadow-card-hover ${
+              rec.status === "Accepted"
+                ? "border-emerald-500/40 bg-gradient-to-r from-success-subtle/30 via-surface to-surface"
+                : "border-border"
             }`}
           >
             <div className="flex items-start justify-between gap-4">
-              <h3 className="text-base font-semibold text-[#E7E4DC]">{rec.title}</h3>
+              <h3 className="text-base font-bold font-display text-ink tracking-tight">{rec.title}</h3>
               <div className="flex shrink-0 items-center gap-2">
                 {rec.status === "Accepted" && (
-                  <span className="text-[10px] px-2 py-1 rounded border bg-[#3FA77C]/15 text-[#3FA77C] border-[#3FA77C]/30">
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-success-subtle text-success border-success-border">
                     ACCEPTED
                   </span>
                 )}
                 <span
-                  className={`text-[10px] px-2 py-1 rounded border ${
+                  className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
                     confidenceColor[rec.confidence] ?? confidenceColor.Low
                   }`}
                 >
@@ -94,49 +99,49 @@ export default function RecommendationsList({
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <div className="text-[10px] uppercase text-[#5C6580]">Problem</div>
-                <p className="text-sm text-[#8B93A7] mt-1 leading-5">{rec.problem}</p>
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-3.5 rounded-xl bg-surface-subtle border border-border/70">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted">Problem</div>
+                <p className="text-xs sm:text-sm text-ink/90 mt-1 leading-relaxed">{rec.problem}</p>
               </div>
-              <div>
-                <div className="text-[10px] uppercase text-[#5C6580]">Evidence</div>
-                <p className="text-sm text-[#8B93A7] mt-1 leading-5">{rec.evidence}</p>
+              <div className="p-3.5 rounded-xl bg-surface-subtle border border-border/70">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted">Evidence</div>
+                <p className="text-xs sm:text-sm text-ink/90 mt-1 leading-relaxed">{rec.evidence}</p>
               </div>
-              <div>
-                <div className="text-[10px] uppercase text-[#5C6580]">Suggested action</div>
-                <p className="text-sm text-[#E7E4DC] mt-1 leading-5">{rec.action}</p>
+              <div className="p-3.5 rounded-xl bg-brand-subtle/50 border border-brand/20">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-brand">Suggested action</div>
+                <p className="text-xs sm:text-sm text-ink font-semibold mt-1 leading-relaxed">{rec.action}</p>
               </div>
-              <div>
-                <div className="text-[10px] uppercase text-[#5C6580]">Expected impact</div>
-                <p className="text-sm text-[#E7E4DC] mt-1 leading-5">{rec.impact}</p>
+              <div className="p-3.5 rounded-xl bg-secondary-subtle/60 border border-secondary/20">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-secondary">Expected impact</div>
+                <p className="text-xs sm:text-sm text-ink font-semibold mt-1 leading-relaxed">{rec.impact}</p>
               </div>
             </div>
 
             {rec.status === "New" ? (
-              <div className="mt-5 flex gap-3">
+              <div className="mt-6 flex gap-3 pt-3 border-t border-border/70">
                 <button
                   disabled={busy}
                   onClick={() => decide(rec.id, "Accepted")}
-                  className="text-xs rounded-md bg-[#C9A227] text-[#0F1420] font-semibold px-4 py-2 hover:bg-[#DDB646] transition-colors disabled:opacity-50"
+                  className="btn-brand text-xs font-semibold px-4 py-2 rounded-xl shadow-sm transition-all disabled:opacity-50"
                 >
                   {busy ? "Saving…" : "Accept"}
                 </button>
                 <button
                   disabled={busy}
                   onClick={() => decide(rec.id, "Dismissed")}
-                  className="text-xs rounded-md border border-[#242B3D] text-[#8B93A7] font-semibold px-4 py-2 hover:bg-[#0F1420] transition-colors disabled:opacity-50"
+                  className="text-xs rounded-xl border border-border bg-surface text-muted font-semibold px-4 py-2 hover:bg-surface-subtle hover:text-ink transition-colors shadow-sm disabled:opacity-50"
                 >
                   Dismiss
                 </button>
               </div>
             ) : (
-              <div className="mt-5 flex items-center justify-between gap-4">
-                <div className="text-xs text-[#5C6580]">{decidedLine}</div>
+              <div className="mt-5 flex items-center justify-between gap-4 pt-3 border-t border-border/70">
+                <div className="text-xs text-muted font-medium">{decidedLine}</div>
                 <button
                   disabled={busy}
                   onClick={() => decide(rec.id, "New")}
-                  className="text-xs text-[#C9A227] hover:text-[#E7E4DC] transition-colors disabled:opacity-50"
+                  className="text-xs font-semibold text-brand hover:text-brand-hover hover:underline transition-colors disabled:opacity-50"
                 >
                   {busy ? "Saving…" : "Undo"}
                 </button>

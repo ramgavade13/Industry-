@@ -12,7 +12,7 @@ const STATUS_OPTIONS = [
 ];
 
 const inputClass =
-  "w-full bg-[#0F1420] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC] placeholder:text-[#5C6580]";
+  "w-full bg-surface border border-border rounded-xl px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/60 outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20 shadow-sm";
 
 function Field({
   label,
@@ -27,10 +27,17 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-xs text-[#8B93A7] mb-1">{label}</span>
+      <span className="block text-xs font-semibold text-ink/90 mb-1.5">{label}</span>
       {children}
-      {hint && !error && <span className="block text-xs text-[#5C6580] mt-1">{hint}</span>}
-      {error && <span className="block text-xs text-[#D65F5F] mt-1">{error}</span>}
+      {hint && !error && <span className="block text-xs text-muted mt-1.5">{hint}</span>}
+      {error && (
+        <span className="block text-xs font-semibold text-danger mt-1.5 flex items-center gap-1">
+          <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{error}</span>
+        </span>
+      )}
     </label>
   );
 }
@@ -51,10 +58,13 @@ export default function ProjectForm({
   const err = (key: string) => state?.fieldErrors?.[key];
 
   return (
-    <form action={formAction} className="bg-[#161C2C] border border-[#242B3D] rounded-lg p-6 max-w-3xl">
+    <form action={formAction} className="card rounded-2xl p-6 sm:p-8 bg-surface border border-border shadow-card max-w-3xl">
       {state?.error && (
-        <div className="mb-5 rounded-md border border-[#D65F5F]/40 bg-[#D65F5F]/10 px-4 py-3 text-sm text-[#D65F5F]">
-          {state.error}
+        <div className="mb-6 rounded-xl border border-danger-border bg-danger-subtle px-4 py-3 text-sm font-semibold text-danger flex items-center gap-2 shadow-sm">
+          <svg className="w-4 h-4 shrink-0 text-danger" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{state.error}</span>
         </div>
       )}
 
@@ -152,15 +162,15 @@ export default function ProjectForm({
         </Field>
       </div>
 
-      <div className="flex items-center gap-4 mt-6">
+      <div className="flex items-center gap-4 mt-8 pt-4 border-t border-border">
         <button
           type="submit"
           disabled={pending}
-          className="bg-[#C9A227] text-[#0F1420] rounded-md px-5 py-2 text-sm font-medium disabled:opacity-60"
+          className="btn-brand rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all disabled:opacity-60"
         >
           {pending ? "Saving..." : submitLabel}
         </button>
-        <Link href="/projects" className="text-sm text-[#8B93A7] hover:text-[#E7E4DC]">
+        <Link href="/projects" className="text-sm font-semibold text-muted hover:text-ink transition-colors">
           Cancel
         </Link>
       </div>

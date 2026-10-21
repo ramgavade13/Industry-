@@ -14,8 +14,8 @@ export default function AnimatedNumber({
   useEffect(() => {
     const match = value.match(/^([^\d-]*)(-?\d+(?:\.\d+)?)(.*)$/);
     if (!match) {
-      setDisplay(value);
-      return;
+      const frame = requestAnimationFrame(() => setDisplay(value));
+      return () => cancelAnimationFrame(frame);
     }
     const [, prefix, numStr, suffix] = match;
     const target = parseFloat(numStr);

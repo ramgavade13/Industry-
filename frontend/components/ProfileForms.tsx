@@ -8,15 +8,21 @@ import type { ManagedUser, SaveState } from "@/lib/userTypes";
 function Notice({ state, ok }: { state: SaveState; ok: string }) {
   if (state?.saved) {
     return (
-      <div className="mb-5 rounded-md border border-[#3FA77C]/40 bg-[#3FA77C]/10 px-4 py-3 text-sm text-[#3FA77C]">
-        {ok}
+      <div className="mb-6 rounded-xl border border-success-border bg-success-subtle px-4 py-3 text-sm font-semibold text-success flex items-center gap-2 shadow-sm">
+        <svg className="w-4 h-4 shrink-0 text-success" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        <span>{ok}</span>
       </div>
     );
   }
   if (state?.error) {
     return (
-      <div className="mb-5 rounded-md border border-[#D65F5F]/40 bg-[#D65F5F]/10 px-4 py-3 text-sm text-[#D65F5F]">
-        {state.error}
+      <div className="mb-6 rounded-xl border border-danger-border bg-danger-subtle px-4 py-3 text-sm font-semibold text-danger flex items-center gap-2 shadow-sm">
+        <svg className="w-4 h-4 shrink-0 text-danger" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+        <span>{state.error}</span>
       </div>
     );
   }
@@ -29,8 +35,8 @@ export function ProfileForm({ profile }: { profile: ManagedUser }) {
   const err = (key: string) => state?.fieldErrors?.[key];
 
   return (
-    <form action={formAction} className="bg-[#161C2C] border border-[#242B3D] rounded-lg p-6">
-      <h3 className="text-sm font-semibold text-[#E7E4DC] mb-4">Your details</h3>
+    <form action={formAction} className="card rounded-2xl p-6 sm:p-8 bg-surface border border-border shadow-card">
+      <h3 className="text-lg font-bold font-display text-ink mb-5 pb-3 border-b border-border/70">Your details</h3>
       <Notice state={state} ok="Profile saved." />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <Field label="First name" error={err("first_name")}>
@@ -48,7 +54,7 @@ export function ProfileForm({ profile }: { profile: ManagedUser }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 bg-[#C9A227] text-[#0F1420] rounded-md px-5 py-2 text-sm font-medium disabled:opacity-60"
+        className="btn-brand mt-6 rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all disabled:opacity-60"
       >
         {pending ? "Saving..." : "Save details"}
       </button>
@@ -61,8 +67,8 @@ export function PasswordForm() {
   const err = (key: string) => state?.fieldErrors?.[key];
 
   return (
-    <form action={formAction} className="bg-[#161C2C] border border-[#242B3D] rounded-lg p-6">
-      <h3 className="text-sm font-semibold text-[#E7E4DC] mb-4">Change password</h3>
+    <form action={formAction} className="card rounded-2xl p-6 sm:p-8 bg-surface border border-border shadow-card">
+      <h3 className="text-lg font-bold font-display text-ink mb-5 pb-3 border-b border-border/70">Change password</h3>
       <Notice state={state} ok="Password changed." />
       <div className="space-y-5">
         <Field label="Current password" error={err("current_password")}>
@@ -78,7 +84,7 @@ export function PasswordForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 bg-[#C9A227] text-[#0F1420] rounded-md px-5 py-2 text-sm font-medium disabled:opacity-60"
+        className="btn-brand mt-6 rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all disabled:opacity-60"
       >
         {pending ? "Saving..." : "Change password"}
       </button>

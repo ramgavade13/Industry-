@@ -23,7 +23,7 @@ export default function BusinessScene() {
 
     // ---- scene / camera / renderer ----
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x020617, 0.03);
+    scene.fog = new THREE.FogExp2(0xf6f8fb, 0.025);
 
     const camera = new THREE.PerspectiveCamera(55, w() / h(), 0.1, 100);
     camera.position.set(0, 1.5, 14);
@@ -35,11 +35,11 @@ export default function BusinessScene() {
     mount.appendChild(renderer.domElement);
 
     // ---- lights ----
-    scene.add(new THREE.AmbientLight(0x93c5fd, 0.7));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.1);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+    const sun = new THREE.DirectionalLight(0xffffff, 0.9);
     sun.position.set(5, 10, 7);
     scene.add(sun);
-    const goldLight = new THREE.PointLight(0xf59e0b, 80, 40);
+    const goldLight = new THREE.PointLight(0xd97706, 50, 40);
     goldLight.position.set(6, 4, 4);
     scene.add(goldLight);
 
@@ -57,13 +57,13 @@ export default function BusinessScene() {
     const barMats: THREE.MeshStandardMaterial[] = [];
     const bars = targets.map((_, i) => {
       const mat = new THREE.MeshStandardMaterial({
-        color: 0x2563eb,
-        emissive: 0x1e40af,
-        emissiveIntensity: 0.4,
-        metalness: 0.5,
-        roughness: 0.35,
+        color: 0x3b82f6,
+        emissive: 0x1d4ed8,
+        emissiveIntensity: 0.25,
+        metalness: 0.3,
+        roughness: 0.4,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.75,
       });
       barMats.push(mat);
       const bar = new THREE.Mesh(barGeo, mat);
@@ -78,9 +78,9 @@ export default function BusinessScene() {
     );
     const lineGeo = new THREE.TubeGeometry(curve, 120, 0.05, 8, false);
     const lineMat = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b,
-      emissive: 0xf59e0b,
-      emissiveIntensity: 0.9,
+      color: 0xd97706,
+      emissive: 0xd97706,
+      emissiveIntensity: 0.8,
     });
     chart.add(new THREE.Mesh(lineGeo, lineMat));
     const lineIndexCount = lineGeo.index ? lineGeo.index.count : 0;
@@ -88,10 +88,10 @@ export default function BusinessScene() {
     // ---- wireframe globe ----
     const globeGeo = new THREE.IcosahedronGeometry(2.4, 1);
     const globeMat = new THREE.MeshBasicMaterial({
-      color: 0x3b82f6,
+      color: 0x93c5fd,
       wireframe: true,
       transparent: true,
-      opacity: 0.22,
+      opacity: 0.3,
     });
     const globe = new THREE.Mesh(globeGeo, globeMat);
     globe.position.set(-7, 3, -8);
@@ -109,21 +109,21 @@ export default function BusinessScene() {
     pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     const pMat = new THREE.PointsMaterial({
       size: 0.06,
-      color: 0x60a5fa,
+      color: 0x94a3b8,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.4,
       depthWrite: false,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
     });
     const particles = new THREE.Points(pGeo, pMat);
     scene.add(particles);
 
     // ---- floor grid ----
-    const grid = new THREE.GridHelper(60, 60, 0x1e3a8a, 0x1e293b);
+    const grid = new THREE.GridHelper(60, 60, 0xcfdbe8, 0xe2e8f0);
     grid.position.y = -3.5;
     const gridMat = grid.material as THREE.Material;
     gridMat.transparent = true;
-    gridMat.opacity = 0.35;
+    gridMat.opacity = 0.5;
     scene.add(grid);
 
     // ---- animation ----
@@ -204,7 +204,7 @@ export default function BusinessScene() {
       className="pointer-events-none fixed inset-0 z-0"
       style={{
         background:
-          "radial-gradient(ellipse at 75% 60%, #0f2a5c 0%, #071226 45%, #020617 100%)",
+          "radial-gradient(ellipse at 75% 45%, #eef3f9 0%, #f6f8fb 60%, #edf1f7 100%)",
       }}
     >
       <div ref={mountRef} className="h-full w-full" />
