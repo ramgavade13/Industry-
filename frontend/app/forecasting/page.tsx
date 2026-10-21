@@ -4,13 +4,13 @@ import ChartWidget from "@/components/ChartWidget";
 import { fetchForecastChart, fetchForecastSummary, fetchForecastNotes } from "@/lib/api";
 import { fetchProjectForecast } from "@/lib/projectForecastApi";
 
-const STATE_STYLES: Record<string, string> = {
-  "On track": "text-[#5FB985] border-[#5FB985]/40",
-  "At risk": "text-[#E0A93B] border-[#E0A93B]/40",
-  Delayed: "text-[#D65F5F] border-[#D65F5F]/40",
-  Completed: "text-[#8B93A7] border-[#8B93A7]/40",
+// Maps forecast state to badge utility classes from globals.css
+const STATE_BADGE: Record<string, string> = {
+  "On track": "badge-low",
+  "At risk": "badge-medium",
+  Delayed: "badge-high",
+  Completed: "bg-surface-subtle text-muted border border-border",
 };
-const DEFAULT_STATE_STYLE = "text-[#8B93A7] border-[#242B3D]";
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -50,19 +50,19 @@ export default async function ForecastingPage() {
             data={chartData as unknown as Record<string, string | number>[]}
             xKey="month"
             series={[
-              { key: "actual", label: "Actual", color: "#8B93A7" },
-              { key: "forecast", label: "Forecast", color: "#C9A227" },
+              { key: "actual", label: "Actual", color: "var(--color-muted)" },
+              { key: "forecast", label: "Forecast", color: "var(--color-brand)" },
             ]}
           />
         </div>
 
-        <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg px-5 py-5">
-          <h3 className="text-sm font-semibold text-[#E7E4DC] mb-4">What the model is seeing</h3>
+        <div className="card rounded-xl px-5 py-5">
+          <h3 className="text-sm font-semibold text-ink mb-4">What the model is seeing</h3>
           <div className="space-y-4">
             {notes.map((n) => (
-              <div key={n.title} className="border-l-2 border-[#C9A227]/40 pl-3">
-                <div className="text-sm text-[#E7E4DC]">{n.title}</div>
-                <p className="text-xs text-[#8B93A7] mt-1 leading-5">{n.detail}</p>
+              <div key={n.title} className="border-l-2 border-brand/40 pl-3">
+                <div className="text-sm font-medium text-ink">{n.title}</div>
+                <p className="text-xs text-muted mt-1 leading-5">{n.detail}</p>
               </div>
             ))}
           </div>
@@ -70,18 +70,18 @@ export default async function ForecastingPage() {
       </div>
 
       {projectForecast && (
-        <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg px-5 py-5 mt-6">
+        <div className="card rounded-xl px-5 py-5 mt-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-[#E7E4DC]">Project Progress Forecast</h3>
-              <p className="text-xs text-[#8B93A7] mt-1 leading-5">
+              <h3 className="text-sm font-semibold text-ink">Project Progress Forecast</h3>
+              <p className="text-xs text-muted mt-1 leading-5">
                 Each project&apos;s progress so far is used to estimate when it will reach 100%,
                 assuming the same pace continues.
               </p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
               {["On track", "At risk", "Delayed", "Completed"].map((s) => (
-                <span key={s} className={`rounded-full border px-3 py-1 ${STATE_STYLES[s]}`}>
+                <span key={s} className={`inline-flex items-center px-2.5 py-1 rounded-full font-semibold border ${STATE_BADGE[s] ?? "bg-surface-subtle text-muted border-border"}`}>
                   {projectForecast.summary[s] ?? 0} {s}
                 </span>
               ))}
@@ -91,37 +91,37 @@ export default async function ForecastingPage() {
           <div className="overflow-x-auto mt-4">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-[#8B93A7] border-b border-[#242B3D]">
-                  <th className="py-2 pr-4 font-medium">Project</th>
-                  <th className="py-2 pr-4 font-medium">Progress</th>
-                  <th className="py-2 pr-4 font-medium">Planned end</th>
-                  <th className="py-2 pr-4 font-medium">Projected finish</th>
-                  <th className="py-2 pr-4 font-medium">Difference</th>
-                  <th className="py-2 pr-4 font-medium">At deadline</th>
-                  <th className="py-2 font-medium">Status</th>
+                <tr className="text-left text-xs text-muted border-b border-border bg-surface-subtle">
+                  <th className="py-2 pr-4 font-semibold">Project</th>
+                  <th className="py-2 pr-4 font-semibold">Progress</th>
+                  <th className="py-2 pr-4 font-semibold">Planned end</th>
+                  <th className="py-2 pr-4 font-semibold">Projected finish</th>
+                  <th className="py-2 pr-4 font-semibold">Difference</th>
+                  <th className="py-2 pr-4 font-semibold">At deadline</th>
+                  <th className="py-2 font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {projectForecast.projects.map((p) => (
-                  <tr key={p.id} className="border-b border-[#242B3D]/60 last:border-0 align-top" title={p.note}>
+                  <tr key={p.id} className="border-b border-border last:border-0 align-top hover:bg-surface-subtle transition-colors" title={p.note}>
                     <td className="py-3 pr-4">
-                      <div className="text-[#E7E4DC]">{p.name}</div>
-                      {p.team && <div className="text-xs text-[#5C6580]">{p.team}</div>}
+                      <div className="text-ink font-medium">{p.name}</div>
+                      {p.team && <div className="text-xs text-muted font-normal">{p.team}</div>}
                     </td>
                     <td className="py-3 pr-4 min-w-28">
-                      <div className="h-1.5 rounded-full bg-[#0F1420] overflow-hidden">
-                        <div className="h-full bg-[#C9A227]" style={{ width: `${p.progress}%` }} />
+                      <div className="h-1.5 rounded-full bg-surface-subtle border border-border overflow-hidden">
+                        <div className="h-full bg-brand rounded-full" style={{ width: `${p.progress}%` }} />
                       </div>
-                      <div className="text-xs text-[#8B93A7] mt-1">{p.progress}%</div>
+                      <div className="text-xs text-muted mt-1 tabular-nums">{p.progress}%</div>
                     </td>
-                    <td className="py-3 pr-4 text-[#8B93A7] whitespace-nowrap">{formatDate(p.end_date)}</td>
-                    <td className="py-3 pr-4 text-[#E7E4DC] whitespace-nowrap">{formatDate(p.projected_finish)}</td>
-                    <td className="py-3 pr-4 text-[#8B93A7] whitespace-nowrap">{lateness(p.days_late)}</td>
-                    <td className="py-3 pr-4 text-[#8B93A7]">
+                    <td className="py-3 pr-4 text-muted whitespace-nowrap tabular-nums">{formatDate(p.end_date)}</td>
+                    <td className="py-3 pr-4 text-ink whitespace-nowrap tabular-nums">{formatDate(p.projected_finish)}</td>
+                    <td className="py-3 pr-4 text-muted whitespace-nowrap tabular-nums">{lateness(p.days_late)}</td>
+                    <td className="py-3 pr-4 text-muted tabular-nums">
                       {p.progress_at_deadline === null ? "—" : `${p.progress_at_deadline}%`}
                     </td>
                     <td className="py-3">
-                      <span className={`rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap ${STATE_STYLES[p.state] ?? DEFAULT_STATE_STYLE}`}>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border whitespace-nowrap ${STATE_BADGE[p.state] ?? "bg-surface-subtle text-muted border-border"}`}>
                         {p.state}
                       </span>
                     </td>
@@ -130,7 +130,7 @@ export default async function ForecastingPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-[#5C6580] mt-4">
+          <p className="text-xs text-muted/70 mt-4">
             A project up to a week behind is &ldquo;At risk&rdquo;; more than a week behind is &ldquo;Delayed&rdquo;.
             Hover over a row for the reason.
           </p>
