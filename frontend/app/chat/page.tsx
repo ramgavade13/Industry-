@@ -97,27 +97,27 @@ export default function ChatPage() {
     <DashboardLayout role="ceo" title={content.title} subtitle={content.subtitle}>
       <div className="flex h-[calc(100vh-220px)] gap-4">
         {/* Past chats */}
-        <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161C2C] border border-[#242B3D] rounded-lg overflow-hidden">
-          <div className="p-3 border-b border-[#242B3D]">
+        <aside className="card hidden md:flex w-60 shrink-0 flex-col overflow-hidden">
+          <div className="p-3 border-b border-border">
             <button
               onClick={newChat}
               disabled={thinking}
-              className="w-full rounded-md border border-[#C9A227] text-[#C9A227] text-sm font-semibold py-2 hover:bg-[#C9A227]/10 transition-colors disabled:opacity-50"
+              className="w-full rounded-xl border border-brand text-brand text-sm font-semibold py-2 hover:bg-brand-subtle transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-brand/20"
             >
               + New chat
             </button>
           </div>
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {chats.length === 0 && (
-              <p className="px-2 py-3 text-xs text-[#5C6580]">No saved chats yet. Ask a question to start one.</p>
+              <p className="px-2 py-3 text-xs text-muted">No saved chats yet. Ask a question to start one.</p>
             )}
             {chats.map((c) => (
               <div
                 key={c.id}
-                className={`group flex items-center gap-1 rounded-md px-2 py-2 text-sm cursor-pointer transition-colors ${
+                className={`group flex items-center gap-1 rounded-lg px-2 py-2 text-sm cursor-pointer transition-colors ${
                   c.id === activeId
-                    ? "bg-[#0F1420] text-[#E7E4DC] border border-[#C9A227]/40"
-                    : "text-[#8B93A7] border border-transparent hover:bg-[#0F1420] hover:text-[#E7E4DC]"
+                    ? "bg-brand-subtle text-ink border border-brand/40"
+                    : "text-muted border border-transparent hover:bg-surface-subtle hover:text-ink"
                 }`}
                 onClick={() => openChat(c.id)}
               >
@@ -125,7 +125,7 @@ export default function ChatPage() {
                 <button
                   onClick={(e) => { e.stopPropagation(); removeChat(c.id); }}
                   aria-label="Delete chat"
-                  className="text-xs text-[#5C6580] hover:text-[#D65F5F] opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                  className="text-xs text-muted/70 hover:text-danger opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                 >
                   ✕
                 </button>
@@ -135,26 +135,26 @@ export default function ChatPage() {
         </aside>
 
         {/* Conversation */}
-        <div className="flex flex-1 min-w-0 flex-col bg-[#161C2C] border border-[#242B3D] rounded-lg overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+        <div className="card flex flex-1 min-w-0 flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 bg-surface-subtle/60">
             {/* Welcome message, chosen by role */}
             {activeId === null && (
               <div className="flex justify-start">
-                <div className="max-w-[75%] rounded-lg px-4 py-3 text-sm whitespace-pre-line leading-6 bg-[#0F1420] border border-[#242B3D] text-[#E7E4DC]">
+                <div className="max-w-[75%] rounded-2xl px-4 py-3 text-sm whitespace-pre-line leading-6 bg-surface border border-border text-ink shadow-sm">
                   {content.welcome}
                 </div>
               </div>
             )}
 
-            {opening && <p className="text-xs text-[#8B93A7]">Loading chat…</p>}
+            {opening && <p className="text-xs text-muted">Loading chat…</p>}
 
             {messages.map((m) => (
               <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[75%] rounded-lg px-4 py-3 text-sm whitespace-pre-line leading-6 ${
+                  className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm whitespace-pre-line leading-6 shadow-sm ${
                     m.role === "user"
-                      ? "bg-[#C9A227] text-[#0F1420]"
-                      : "bg-[#0F1420] border border-[#242B3D] text-[#E7E4DC]"
+                      ? "bg-brand text-ink font-medium"
+                      : "bg-surface border border-border text-ink"
                   }`}
                 >
                   {m.text}
@@ -164,7 +164,7 @@ export default function ChatPage() {
 
             {thinking && (
               <div className="flex justify-start">
-                <div className="bg-[#0F1420] border border-[#242B3D] rounded-lg px-4 py-3 text-sm text-[#8B93A7]">
+                <div className="bg-surface border border-border rounded-2xl px-4 py-3 text-sm text-muted shadow-sm">
                   <span className="inline-flex gap-1">
                     <span className="animate-bounce [animation-delay:0ms]">•</span>
                     <span className="animate-bounce [animation-delay:150ms]">•</span>
@@ -177,12 +177,12 @@ export default function ChatPage() {
           </div>
 
           {messages.length === 0 && !opening && content.suggestions.length > 0 && (
-            <div className="px-6 pb-3 flex flex-wrap gap-2">
+            <div className="px-6 py-3 flex flex-wrap gap-2 border-t border-border bg-surface">
               {content.suggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="text-xs rounded-full border border-[#242B3D] text-[#8B93A7] px-3 py-1.5 hover:border-[#C9A227]/40 hover:text-[#E7E4DC] transition-colors"
+                  className="text-xs rounded-full border border-border bg-surface text-muted px-3 py-1.5 hover:border-brand/40 hover:text-ink transition-colors focus:outline-none focus:ring-2 focus:ring-brand/20"
                 >
                   {s}
                 </button>
@@ -192,18 +192,18 @@ export default function ChatPage() {
 
           <form
             onSubmit={(e) => { e.preventDefault(); send(input); }}
-            className="border-t border-[#242B3D] px-4 py-4 flex gap-3"
+            className="border-t border-border bg-surface px-4 py-4 flex gap-3"
           >
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={content.placeholder}
-              className="flex-1 rounded-md border border-[#242B3D] bg-[#0F1420] px-4 py-2.5 text-sm text-[#E7E4DC] outline-none transition-colors focus:border-[#C9A227]"
+              className="flex-1 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-muted/60 outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20"
             />
             <button
               type="submit"
               disabled={thinking || opening || !input.trim()}
-              className="rounded-md bg-[#C9A227] text-[#0F1420] text-sm font-semibold px-5 py-2.5 hover:bg-[#DDB646] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-brand rounded-xl text-sm font-semibold px-5 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Send
             </button>
