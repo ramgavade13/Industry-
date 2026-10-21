@@ -105,7 +105,7 @@ def _ask_gemini(prompt):
             continue
         try:
             model = genai.GenerativeModel(name)
-            response = model.generate_content(prompt, request_options={"timeout": 30})
+            response = model.generate_content(prompt, request_options={"timeout": 12})
             return response.text
         except gexc.TooManyRequests:
             logger.warning("Gemini quota reached for %s, trying next model", name)
@@ -114,7 +114,8 @@ def _ask_gemini(prompt):
             logger.warning("Model %s is not usable, skipping it", name)
             _exhausted_until[name] = now + 24 * 60 * 60
         except Exception as exc:  # network error, blocked/empty response, etc.
-            logger.warning("Gemini call failed for %s: %s", name, exc)
+                        logger.warning("Gemini call failed for %s: %s", name, exc)
+                        _exhausted_until[name] = now + 120   # skip this model for 2 minutes
     return None
 
 
