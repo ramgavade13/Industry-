@@ -351,3 +351,334 @@ h1, h2, h3, h4, h5, h6, .font-display {
     transform: none !important;
   }
 }
+
+
+/* ==========================================================================
+   Phase 5: animations and polish (paste at the very end of globals.css)
+   ========================================================================== */
+
+/* Hero entrance: each element rises in after its own delay (--d) */
+@keyframes rise-in-lg {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  animation: rise-in-lg 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* Rotating headline word */
+.word-swap {
+  opacity: 0;
+  transform: translateY(0.35em);
+  filter: blur(4px);
+  transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
+}
+
+.word-swap.is-active {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Slowly drifting background orbs and dot grid */
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(70px, 50px, 0) scale(1.15); }
+}
+
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-80px, -40px, 0) scale(1.12); }
+}
+
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(50px, -60px, 0) scale(1.2); }
+}
+
+.animate-drift-a { animation: drift-a 18s ease-in-out infinite; }
+.animate-drift-b { animation: drift-b 22s ease-in-out infinite; }
+.animate-drift-c { animation: drift-c 26s ease-in-out infinite; }
+
+.hero-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.07) 1px, transparent 0);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+}
+
+/* Tilt + moving light on the glass tiles */
+.tilt-card {
+  position: relative;
+  overflow: hidden;
+  transform: perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.15s ease-out, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.tilt-card:hover {
+  transform: perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-2px);
+}
+
+.tilt-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    220px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(201, 148, 0, 0.16),
+    transparent 70%
+  );
+  transition: opacity 0.25s ease;
+}
+
+.tilt-card:hover::before {
+  opacity: 1;
+}
+
+.tilt-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Login card: soft light that follows the mouse */
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(201, 148, 0, 0.12),
+    transparent 70%
+  );
+  transition: opacity 0.3s ease;
+}
+
+.spotlight:hover::before {
+  opacity: 1;
+}
+
+.spotlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sparkline draws itself once, then the end dot pulses */
+@keyframes fade-in-soft {
+  to { opacity: 1; }
+}
+
+@keyframes spark-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes dot-ring {
+  0% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 0; transform: scale(3.2); }
+}
+
+.spark-line {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: spark-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.7s forwards;
+}
+
+.spark-area {
+  opacity: 0;
+  animation: fade-in-soft 0.8s ease 1.9s forwards;
+}
+
+.spark-dot {
+  opacity: 0;
+  animation: fade-in-soft 0.3s ease 2.2s forwards;
+}
+
+.spark-dot-ring {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dot-ring 2s ease-out 2.3s infinite;
+}
+
+/* Progress bar fills once */
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.bar-fill {
+  transform-origin: left;
+  animation: bar-grow 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.9s backwards;
+}
+
+/* Button: press effect, shimmer on hover, tick on success */
+.btn-brand {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-brand:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+@keyframes shimmer-sweep {
+  to { transform: translateX(130%) skewX(-20deg); }
+}
+
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateX(-130%) skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+}
+
+.btn-shimmer:hover:not(:disabled)::after {
+  animation: shimmer-sweep 0.9s ease;
+}
+
+@keyframes check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.check-draw {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: check-draw 0.45s ease-out forwards;
+}
+
+/* Sample alert ticker */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 40s linear infinite;
+}
+
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+.ticker-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ---------- Site-wide polish (no page edits needed) ---------- */
+
+/* Each page fades in. Opacity only, so modals and fixed elements are unaffected. */
+@keyframes page-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+main {
+  animation: page-fade 380ms ease-out both;
+}
+
+/* Cards inside a grid rise in one after another */
+main .grid > :is(.card, .card-glow, .glass-card) {
+  animation: rise-in 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+main .grid > :nth-child(2) { animation-delay: 70ms; }
+main .grid > :nth-child(3) { animation-delay: 140ms; }
+main .grid > :nth-child(4) { animation-delay: 210ms; }
+main .grid > :nth-child(5) { animation-delay: 280ms; }
+main .grid > :nth-child(6) { animation-delay: 350ms; }
+main .grid > :nth-child(7) { animation-delay: 420ms; }
+main .grid > :nth-child(8) { animation-delay: 490ms; }
+
+/* Table rows highlight smoothly */
+tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+  background-color: color-mix(in srgb, var(--brand) 6%, transparent);
+}
+
+/* Clear keyboard focus ring on links and buttons (inputs keep their own) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 70%, transparent);
+  outline-offset: 2px;
+}
+
+/* Loading placeholder: add class="skeleton" plus a height and width to any empty block */
+@keyframes skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+.skeleton {
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--surface-subtle) 25%, #e6ebf3 50%, var(--surface-subtle) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s linear infinite;
+}
+
+/* Respect "reduce motion" for everything above */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  main,
+  main .grid > :is(.card, .card-glow, .glass-card),
+  .animate-drift-a,
+  .animate-drift-b,
+  .animate-drift-c,
+  .spark-dot-ring,
+  .bar-fill,
+  .ticker-track,
+  .skeleton,
+  .btn-shimmer::after,
+  .check-draw {
+    animation: none !important;
+  }
+
+  .word-swap,
+  .tilt-card,
+  .tilt-card:hover,
+  .btn-brand:active:not(:disabled) {
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .spark-line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  .spark-area,
+  .spark-dot {
+    animation: none;
+    opacity: 1;
+  }
+
+  .check-draw {
+    stroke-dashoffset: 0;
+  }
+
+  .ticker-track {
+    overflow-x: auto;
+  }
+}
