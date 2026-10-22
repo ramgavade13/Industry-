@@ -1,5 +1,5 @@
 export const inputClass =
-  "w-full bg-[#0F1420] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC] placeholder:text-[#5C6580]";
+  "w-full bg-surface border border-border rounded-xl px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/60 outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20 shadow-sm disabled:bg-surface-subtle disabled:opacity-60";
 
 export function Field({
   label,
@@ -14,10 +14,17 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-xs text-[#8B93A7] mb-1">{label}</span>
+      <span className="block text-xs font-semibold text-ink/90 mb-1.5">{label}</span>
       {children}
-      {hint && !error && <span className="block text-xs text-[#5C6580] mt-1">{hint}</span>}
-      {error && <span className="block text-xs text-[#D65F5F] mt-1">{error}</span>}
+      {hint && !error && <span className="block text-xs text-muted mt-1.5">{hint}</span>}
+      {error && (
+        <span className="block text-xs font-semibold text-danger mt-1.5 flex items-center gap-1">
+          <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{error}</span>
+        </span>
+      )}
     </label>
   );
 }

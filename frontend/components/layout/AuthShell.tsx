@@ -15,12 +15,20 @@ export default function AuthShell({ title, children }: { title: string; children
   }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-16">
+    <main className="flex min-h-screen items-center justify-center px-6 py-16 bg-background text-ink">
       <div
         ref={card}
-        className="w-full max-w-sm rounded-2xl border border-[#242B3D] bg-[#0F1420]/75 p-8 shadow-2xl backdrop-blur-md"
+        className="w-full max-w-md rounded-2xl border border-border/80 bg-surface/95 p-8 shadow-raised backdrop-blur-md"
       >
-        <h1 className="mb-8 text-center text-2xl font-bold">{title}</h1>
+        <div className="mb-6 flex flex-col items-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand via-amber-500 to-amber-600 flex items-center justify-center text-slate-950 font-bold shadow-md shadow-brand/20 mb-3">
+            <svg className="w-6 h-6 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-brand">Industry</div>
+          <h1 className="mt-1 text-center text-2xl font-bold font-display text-ink tracking-tight">{title}</h1>
+        </div>
         {children}
       </div>
     </main>

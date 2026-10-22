@@ -27,75 +27,85 @@ export default async function TeamsPage({
           name="q"
           defaultValue={q}
           placeholder="Search by team, project or person"
-          className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC] placeholder:text-[#5C6580] w-72"
+          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted/60 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all w-full sm:w-72"
         />
-        <button type="submit" className="bg-[#242B3D] text-[#E7E4DC] rounded-md px-4 py-2 text-sm font-medium">
+        <button
+          type="submit"
+          className="rounded-lg border border-border bg-surface-subtle px-4 py-2 text-sm font-medium text-ink hover:bg-border transition-colors focus:outline-none focus:ring-2 focus:ring-brand/30"
+        >
           Apply
         </button>
         {q && (
-          <Link href="/teams" className="px-2 py-2 text-sm text-[#8B93A7] hover:text-[#E7E4DC]">
+          <Link href="/teams" className="px-2 py-2 text-sm text-muted hover:text-ink transition-colors">
             Clear
           </Link>
         )}
       </form>
 
       {teams.length === 0 && (
-        <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg px-5 py-6 text-center text-sm text-[#8B93A7]">
+        <div className="card rounded-xl px-5 py-8 text-center text-sm text-muted">
           No teams match your search.
         </div>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {teams.map((t) => (
-          <div key={t.team} className="bg-[#161C2C] border border-[#242B3D] rounded-lg overflow-hidden">
-            <div className="px-5 py-4 border-b border-[#242B3D]">
+          <div key={t.team} className="card rounded-xl overflow-hidden">
+            <div className="px-5 py-4 border-b border-border">
               <div className="flex items-baseline justify-between">
-                <h3 className="text-sm font-semibold text-[#E7E4DC]">{t.team}</h3>
-                <span className="text-xs text-[#8B93A7]">
+                <h3 className="text-sm font-semibold text-ink">{t.team}</h3>
+                <span className="text-xs text-muted">
                   {t.project_count} project{t.project_count !== 1 ? "s" : ""} · {t.member_count} member
                   {t.member_count !== 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="h-2 rounded bg-[#242B3D] overflow-hidden mt-3">
-                <div className="h-2 bg-[#C9A227]" style={{ width: `${t.completion_rate}%` }} />
+              {/* Progress bar */}
+              <div className="h-2 rounded-full bg-surface-subtle border border-border overflow-hidden mt-3">
+                <div className="h-2 bg-brand rounded-full" style={{ width: `${t.completion_rate}%` }} />
               </div>
-              <div className="flex justify-between text-xs text-[#8B93A7] mt-1">
+              <div className="flex justify-between text-xs text-muted mt-1 tabular-nums">
                 <span>
                   {t.tasks_completed} of {t.tasks_total} tasks completed ({t.completion_rate}%)
                 </span>
-                <span className={t.tasks_delayed ? "text-[#D65F5F]" : ""}>{t.tasks_delayed} delayed</span>
+                <span className={t.tasks_delayed ? "text-danger font-semibold" : ""}>
+                  {t.tasks_delayed} delayed
+                </span>
               </div>
               {t.projects.length > 0 && (
-                <div className="text-xs text-[#5C6580] mt-2">{t.projects.join(", ")}</div>
+                <div className="text-xs text-muted/70 mt-2">{t.projects.join(", ")}</div>
               )}
             </div>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-[#8B93A7] border-b border-[#242B3D]">
-                  <th className="px-5 py-2 font-medium">Member</th>
-                  <th className="px-5 py-2 font-medium">Tasks</th>
-                  <th className="px-5 py-2 font-medium">Completed</th>
-                  <th className="px-5 py-2 font-medium">Delayed</th>
-                </tr>
-              </thead>
-              <tbody>
-                {t.members.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-5 py-4 text-center text-[#8B93A7]">
-                      No tasks assigned yet.
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs text-muted border-b border-border bg-surface-subtle">
+                    <th className="px-5 py-2 font-semibold">Member</th>
+                    <th className="px-5 py-2 font-semibold">Tasks</th>
+                    <th className="px-5 py-2 font-semibold">Completed</th>
+                    <th className="px-5 py-2 font-semibold">Delayed</th>
                   </tr>
-                )}
-                {t.members.map((m) => (
-                  <tr key={m.id} className="border-b border-[#242B3D] last:border-0">
-                    <td className="px-5 py-2 text-[#E7E4DC]">{m.name}</td>
-                    <td className="px-5 py-2 text-[#8B93A7]">{m.tasks}</td>
-                    <td className="px-5 py-2 text-[#3FA77C]">{m.completed}</td>
-                    <td className={`px-5 py-2 ${m.delayed ? "text-[#D65F5F]" : "text-[#8B93A7]"}`}>{m.delayed}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {t.members.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-5 py-4 text-center text-muted">
+                        No tasks assigned yet.
+                      </td>
+                    </tr>
+                  )}
+                  {t.members.map((m) => (
+                    <tr key={m.id} className="border-b border-border last:border-0 hover:bg-surface-subtle transition-colors">
+                      <td className="px-5 py-2.5 text-ink font-medium">{m.name}</td>
+                      <td className="px-5 py-2.5 text-muted tabular-nums">{m.tasks}</td>
+                      <td className="px-5 py-2.5 text-success font-medium tabular-nums">{m.completed}</td>
+                      <td className={`px-5 py-2.5 tabular-nums font-medium ${m.delayed ? "text-danger" : "text-muted"}`}>
+                        {m.delayed}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))}
       </div>

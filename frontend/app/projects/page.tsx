@@ -5,9 +5,11 @@ import DeleteProjectButton from "@/components/DeleteProjectButton";
 import { fetchProjects } from "@/lib/api";
 import { deleteProject } from "./actions";
 
+// Maps risk level to badge utility classes from globals.css
 const riskBadge: Record<string, string> = {
-  high: "bg-[#D65F5F]/15 text-[#D65F5F] border-[#D65F5F]/40",
-  medium: "bg-[#C9A227]/15 text-[#C9A227] border-[#C9A227]/40",
+  high: "badge-high",
+  medium: "badge-medium",
+  low: "badge-low",
 };
 
 const STATUS_OPTIONS = [
@@ -38,6 +40,9 @@ function formatDate(value: string | null) {
   });
 }
 
+const filterInputClass =
+  "rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted/60 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all";
+
 export default async function ProjectsPage({
   searchParams,
 }: {
@@ -57,10 +62,10 @@ export default async function ProjectsPage({
     >
       {banner && (
         <div
-          className={`mb-5 rounded-md border px-4 py-3 text-sm ${
+          className={`mb-5 rounded-lg border px-4 py-3 text-sm font-medium ${
             banner.good
-              ? "border-[#3FA77C]/40 bg-[#3FA77C]/10 text-[#3FA77C]"
-              : "border-[#D65F5F]/40 bg-[#D65F5F]/10 text-[#D65F5F]"
+              ? "border-success-border bg-success-subtle text-success"
+              : "border-danger-border bg-danger-subtle text-danger"
           }`}
         >
           {banner.text}
@@ -73,12 +78,12 @@ export default async function ProjectsPage({
             name="q"
             defaultValue={q}
             placeholder="Search by project or team"
-            className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC] placeholder:text-[#5C6580] w-72"
+            className={`${filterInputClass} w-full sm:w-72`}
           />
           <select
             name="status"
             defaultValue={status}
-            className="bg-[#161C2C] border border-[#242B3D] rounded-md px-3 py-2 text-sm text-[#E7E4DC]"
+            className={filterInputClass}
           >
             {STATUS_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -88,12 +93,12 @@ export default async function ProjectsPage({
           </select>
           <button
             type="submit"
-            className="bg-[#242B3D] text-[#E7E4DC] rounded-md px-4 py-2 text-sm font-medium"
+            className="rounded-lg border border-border bg-surface-subtle px-4 py-2 text-sm font-medium text-ink hover:bg-border transition-colors focus:outline-none focus:ring-2 focus:ring-brand/30"
           >
             Apply
           </button>
           {(q || status) && (
-            <Link href="/projects" className="px-2 py-2 text-sm text-[#8B93A7] hover:text-[#E7E4DC]">
+            <Link href="/projects" className="px-2 py-2 text-sm text-muted hover:text-ink transition-colors">
               Clear
             </Link>
           )}
@@ -101,91 +106,89 @@ export default async function ProjectsPage({
 
         <Link
           href="/projects/new"
-          className="bg-[#C9A227] text-[#0F1420] rounded-md px-4 py-2 text-sm font-medium"
+          className="btn-brand text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:ring-offset-1"
         >
           + Add project
         </Link>
       </div>
 
-      <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#242B3D] flex items-baseline justify-between">
-          <h3 className="text-sm font-semibold text-[#E7E4DC]">All projects</h3>
-          <span className="text-xs text-[#8B93A7]">{projects.length} shown</span>
+      <div className="card rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border flex items-baseline justify-between">
+          <h3 className="text-sm font-semibold text-ink">All projects</h3>
+          <span className="text-xs text-muted">{projects.length} shown</span>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs text-[#8B93A7] border-b border-[#242B3D]">
-              <th className="px-5 py-3 font-medium">Project</th>
-              <th className="px-5 py-3 font-medium">Team</th>
-              <th className="px-5 py-3 font-medium w-48">Progress</th>
-              <th className="px-5 py-3 font-medium">Budget</th>
-              <th className="px-5 py-3 font-medium">Deadline</th>
-              <th className="px-5 py-3 font-medium">Risk</th>
-              <th className="px-5 py-3 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {projects.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-5 py-6 text-center text-[#8B93A7]">
-                  No projects match your search.
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-muted border-b border-border bg-surface-subtle">
+                <th className="px-5 py-3 font-semibold">Project</th>
+                <th className="px-5 py-3 font-semibold">Team</th>
+                <th className="px-5 py-3 font-semibold w-48">Progress</th>
+                <th className="px-5 py-3 font-semibold">Budget</th>
+                <th className="px-5 py-3 font-semibold">Deadline</th>
+                <th className="px-5 py-3 font-semibold">Risk</th>
+                <th className="px-5 py-3 font-semibold">Actions</th>
               </tr>
-            )}
-            {projects.map((p) => (
-              <tr key={p.id} className="border-b border-[#242B3D] last:border-0">
-                <td className="px-5 py-3 text-[#E7E4DC]">
-                  {p.name}
-                  <div className="text-xs text-[#5C6580] capitalize">{p.status.replace("_", " ")}</div>
-                </td>
-                <td className="px-5 py-3 text-[#8B93A7]">
-                  {p.team}
-                  <div className="text-xs text-[#5C6580]">{p.team_size} people</div>
-                </td>
-                <td className="px-5 py-3">
-                  <div className="h-2 rounded bg-[#242B3D] overflow-hidden">
-                    <div className="h-2 bg-[#C9A227]" style={{ width: `${p.progress}%` }} />
-                  </div>
-                  <div className="text-xs text-[#8B93A7] mt-1">{p.progress}%</div>
-                </td>
-                <td className={`px-5 py-3 ${p.budget_used_pct > 100 ? "text-[#D65F5F]" : "text-[#8B93A7]"}`}>
-                  {lakh(p.spent)} of {lakh(p.budget)}
-                  <div className="text-xs">{p.budget_used_pct}% used</div>
-                </td>
-                <td className="px-5 py-3 text-[#8B93A7]">
-                  {formatDate(p.end_date)}
-                  <div className={`text-xs ${p.days_left !== null && p.days_left < 10 ? "text-[#D65F5F]" : "text-[#5C6580]"}`}>
-                    {p.days_left === null
-                      ? ""
-                      : p.days_left < 0
-                      ? `${Math.abs(p.days_left)} days overdue`
-                      : `${p.days_left} days left`}
-                  </div>
-                </td>
-                <td className="px-5 py-3">
-                  {riskBadge[p.risk] ? (
-                    <span className={`inline-block rounded border px-2 py-0.5 text-xs uppercase ${riskBadge[p.risk]}`}>
-                      {p.risk}
+            </thead>
+            <tbody>
+              {projects.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-5 py-8 text-center text-muted">
+                    No projects match your search.
+                  </td>
+                </tr>
+              )}
+              {projects.map((p) => (
+                <tr key={p.id} className="border-b border-border last:border-0 hover:bg-surface-subtle transition-colors">
+                  <td className="px-5 py-3 text-ink font-medium">
+                    {p.name}
+                    <div className="text-xs text-muted font-normal capitalize">{p.status.replace("_", " ")}</div>
+                  </td>
+                  <td className="px-5 py-3 text-muted">
+                    {p.team}
+                    <div className="text-xs text-muted/70">{p.team_size} people</div>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="h-2 rounded-full bg-surface-subtle border border-border overflow-hidden">
+                      <div className="h-2 bg-brand rounded-full" style={{ width: `${p.progress}%` }} />
+                    </div>
+                    <div className="text-xs text-muted mt-1 tabular-nums">{p.progress}%</div>
+                  </td>
+                  <td className={`px-5 py-3 tabular-nums ${p.budget_used_pct > 100 ? "text-danger font-semibold" : "text-muted"}`}>
+                    {lakh(p.spent)} of {lakh(p.budget)}
+                    <div className="text-xs">{p.budget_used_pct}% used</div>
+                  </td>
+                  <td className="px-5 py-3 text-muted tabular-nums">
+                    {formatDate(p.end_date)}
+                    <div className={`text-xs ${p.days_left !== null && p.days_left < 10 ? "text-danger font-semibold" : "text-muted/70"}`}>
+                      {p.days_left === null
+                        ? ""
+                        : p.days_left < 0
+                        ? `${Math.abs(p.days_left)} days overdue`
+                        : `${p.days_left} days left`}
+                    </div>
+                  </td>
+                  <td className="px-5 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${riskBadge[p.risk] ?? "badge-low"}`}>
+                      {p.risk ? p.risk.charAt(0).toUpperCase() + p.risk.slice(1) : "Low"}
                     </span>
-                  ) : (
-                    <span className="text-xs text-[#3FA77C]">Low</span>
-                  )}
-                </td>
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-4">
-                    <Link
-                      href={`/projects/${p.id}/edit`}
-                      className="text-xs text-[#C9A227] hover:text-[#E7E4DC] transition-colors"
-                    >
-                      Edit
-                    </Link>
-                    {canDelete && <DeleteProjectButton action={deleteProject.bind(null, p.id)} />}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-4">
+                      <Link
+                        href={`/projects/${p.id}/edit`}
+                        className="text-xs font-semibold text-brand hover:text-brand-hover hover:underline focus:outline-none focus:ring-2 focus:ring-brand/30 rounded transition-colors"
+                      >
+                        Edit
+                      </Link>
+                      {canDelete && <DeleteProjectButton action={deleteProject.bind(null, p.id)} />}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </DashboardLayout>
   );

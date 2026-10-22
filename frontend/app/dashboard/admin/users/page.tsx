@@ -13,10 +13,13 @@ type User = {
   lastLogin: string;
 };
 
-const statusColor: Record<User["status"], string> = {
-  Active: "text-[#3FA77C]",
-  Inactive: "text-[#8B93A7]",
+const statusBadge: Record<User["status"], string> = {
+  Active: "bg-success-subtle text-success border border-success-border",
+  Inactive: "bg-surface-subtle text-muted border border-border",
 };
+
+const inputClass =
+  "w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/60 outline-none transition-all focus:border-brand focus:ring-2 focus:ring-brand/20";
 
 export default function AdminDashboardPage() {
   const [users, setUsers] = useState<User[]>(systemUsers);
@@ -83,13 +86,13 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* User Management */}
-      <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg mt-6 overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#242B3D] flex items-center justify-between gap-4">
+      <div className="card mt-6 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-[#E7E4DC]">
+            <h3 className="text-sm font-semibold text-ink">
               User Management
             </h3>
-            <p className="text-xs text-[#8B93A7] mt-1">
+            <p className="text-xs text-muted mt-1">
               Manage users and their access
             </p>
           </div>
@@ -100,7 +103,7 @@ export default function AdminDashboardPage() {
               setError("");
               setShowForm(true);
             }}
-            className="text-xs rounded-md bg-[#C9A227] text-[#0F1420] font-semibold px-3 py-2 hover:bg-[#DDB646] transition-colors whitespace-nowrap"
+            className="btn-brand text-xs rounded-xl font-semibold px-3 py-2 whitespace-nowrap"
           >
             + Add User
           </button>
@@ -108,9 +111,9 @@ export default function AdminDashboardPage() {
 
         {/* Add User Form */}
         {showForm && (
-          <div className="p-5 border-b border-[#242B3D]">
+          <div className="p-5 border-b border-border bg-surface-subtle/60">
             <div className="max-w-2xl">
-              <h2 className="text-lg font-semibold text-[#E7E4DC] mb-4">
+              <h2 className="text-lg font-semibold font-display text-ink mb-4">
                 Add New User
               </h2>
 
@@ -118,7 +121,7 @@ export default function AdminDashboardPage() {
                 <div>
                   <label
                     htmlFor="user-name"
-                    className="block text-sm text-[#8B93A7] mb-1"
+                    className="block text-sm font-medium text-ink/90 mb-1"
                   >
                     Full Name
                   </label>
@@ -129,14 +132,14 @@ export default function AdminDashboardPage() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter full name"
                     required
-                    className="w-full rounded-md bg-[#0F1420] border border-[#242B3D] px-3 py-2 text-sm text-[#E7E4DC] outline-none focus:border-[#C9A227]"
+                    className={inputClass}
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor="user-email"
-                    className="block text-sm text-[#8B93A7] mb-1"
+                    className="block text-sm font-medium text-ink/90 mb-1"
                   >
                     Email Address
                   </label>
@@ -147,7 +150,7 @@ export default function AdminDashboardPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="user@example.com"
                     required
-                    className="w-full rounded-md bg-[#0F1420] border border-[#242B3D] px-3 py-2 text-sm text-[#E7E4DC] outline-none focus:border-[#C9A227]"
+                    className={inputClass}
                   />
                 </div>
 
@@ -155,7 +158,7 @@ export default function AdminDashboardPage() {
                   <div>
                     <label
                       htmlFor="user-role"
-                      className="block text-sm text-[#8B93A7] mb-1"
+                      className="block text-sm font-medium text-ink/90 mb-1"
                     >
                       Role
                     </label>
@@ -163,7 +166,7 @@ export default function AdminDashboardPage() {
                       id="user-role"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      className="w-full rounded-md bg-[#0F1420] border border-[#242B3D] px-3 py-2 text-sm text-[#E7E4DC] outline-none focus:border-[#C9A227]"
+                      className={inputClass}
                     >
                       <option value="Employee">Employee</option>
                       <option value="Manager">Manager</option>
@@ -175,7 +178,7 @@ export default function AdminDashboardPage() {
                   <div>
                     <label
                       htmlFor="user-status"
-                      className="block text-sm text-[#8B93A7] mb-1"
+                      className="block text-sm font-medium text-ink/90 mb-1"
                     >
                       Status
                     </label>
@@ -185,7 +188,7 @@ export default function AdminDashboardPage() {
                       onChange={(e) =>
                         setStatus(e.target.value as User["status"])
                       }
-                      className="w-full rounded-md bg-[#0F1420] border border-[#242B3D] px-3 py-2 text-sm text-[#E7E4DC] outline-none focus:border-[#C9A227]"
+                      className={inputClass}
                     >
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
@@ -194,7 +197,10 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {error && (
-                  <p role="alert" className="text-sm text-red-400">
+                  <p
+                    role="alert"
+                    className="rounded-xl border border-danger-border bg-danger-subtle px-3.5 py-2.5 text-sm font-medium text-danger"
+                  >
                     {error}
                   </p>
                 )}
@@ -202,7 +208,7 @@ export default function AdminDashboardPage() {
                 <div className="flex flex-wrap gap-3 pt-2">
                   <button
                     type="submit"
-                    className="rounded-md bg-[#C9A227] text-[#0F1420] font-semibold text-sm px-5 py-2 hover:bg-[#DDB646] transition-colors"
+                    className="btn-brand rounded-xl font-semibold text-sm px-5 py-2"
                   >
                     Add User
                   </button>
@@ -213,7 +219,7 @@ export default function AdminDashboardPage() {
                       setShowForm(false);
                       setError("");
                     }}
-                    className="rounded-md border border-[#363E51] text-[#E7E4DC] text-sm px-5 py-2 hover:bg-[#242B3D] transition-colors"
+                    className="rounded-xl border border-border bg-surface text-ink text-sm font-medium px-5 py-2 hover:bg-surface-subtle transition-colors focus:outline-none focus:ring-2 focus:ring-brand/20"
                   >
                     Cancel
                   </button>
@@ -227,7 +233,7 @@ export default function AdminDashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-[#8B93A7] border-b border-[#242B3D]">
+              <tr className="text-left text-xs text-muted bg-surface-subtle border-b border-border">
                 <th className="px-5 py-3 font-medium">Name</th>
                 <th className="px-5 py-3 font-medium">Email</th>
                 <th className="px-5 py-3 font-medium">Role</th>
@@ -240,27 +246,29 @@ export default function AdminDashboardPage() {
               {users.map((user, index) => (
                 <tr
                   key={`${user.email ?? user.name}-${index}`}
-                  className="border-b border-[#242B3D] last:border-0 hover:bg-[#1C2335] transition-colors"
+                  className="border-b border-border last:border-0 hover:bg-surface-subtle transition-colors"
                 >
-                  <td className="px-5 py-3 text-[#E7E4DC] whitespace-nowrap">
+                  <td className="px-5 py-3 text-ink font-medium whitespace-nowrap">
                     {user.name}
                   </td>
 
-                  <td className="px-5 py-3 text-[#8B93A7]">
+                  <td className="px-5 py-3 text-muted">
                     {user.email ?? "—"}
                   </td>
 
-                  <td className="px-5 py-3 text-[#8B93A7]">
+                  <td className="px-5 py-3 text-muted">
                     {user.role}
                   </td>
 
-                  <td
-                    className={`px-5 py-3 font-medium ${statusColor[user.status]}`}
-                  >
-                    {user.status}
+                  <td className="px-5 py-3">
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusBadge[user.status]}`}
+                    >
+                      {user.status}
+                    </span>
                   </td>
 
-                  <td className="px-5 py-3 text-[#8B93A7] whitespace-nowrap">
+                  <td className="px-5 py-3 text-muted whitespace-nowrap">
                     {user.lastLogin}
                   </td>
                 </tr>
@@ -270,7 +278,7 @@ export default function AdminDashboardPage() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-5 py-8 text-center text-[#8B93A7]"
+                    className="px-5 py-8 text-center text-muted"
                   >
                     No users found. Click Add User to create one.
                   </td>
@@ -280,7 +288,7 @@ export default function AdminDashboardPage() {
           </table>
         </div>
 
-        <div className="px-5 py-3 border-t border-[#242B3D] text-xs text-[#8B93A7]">
+        <div className="px-5 py-3 border-t border-border text-xs text-muted">
           Total users: {users.length}
         </div>
       </div>

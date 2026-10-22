@@ -31,13 +31,13 @@ export default async function RecommendationsPage({
             <Link
               key={tab.key || "all"}
               href={tab.key ? `/recommendations?status=${tab.key}` : "/recommendations"}
-              className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
+              className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand/30 ${
                 active
-                  ? "border-[#C9A227] bg-[#C9A227]/10 text-[#E7E4DC]"
-                  : "border-[#242B3D] text-[#8B93A7] hover:text-[#E7E4DC]"
+                  ? "border-brand bg-brand-subtle text-ink font-semibold"
+                  : "border-border text-muted hover:text-ink hover:border-border-hover bg-surface"
               }`}
             >
-              {tab.label} <span className="text-[#5C6580]">{count(tab.key)}</span>
+              {tab.label} <span className={active ? "text-brand font-bold" : "text-muted/70"}>{count(tab.key)}</span>
             </Link>
           );
         })}

@@ -10,20 +10,20 @@ export default async function ProfilePage() {
 
   return (
     <DashboardLayout role={profile.role as Role} title="My Profile" subtitle="Your account details and password">
-      <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg p-6 mb-6 max-w-5xl">
-        <div className="text-lg font-semibold text-[#E7E4DC]">{profile.name}</div>
+      <div className="card p-6 mb-6 max-w-5xl">
+        <div className="text-lg font-semibold font-display text-ink">{profile.name}</div>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div>
-            <div className="text-xs text-[#8B93A7]">Role</div>
-            <div className="text-[#E7E4DC]">{ROLE_LABEL[profile.role] ?? profile.role}</div>
+            <div className="text-xs text-muted">Role</div>
+            <div className="text-ink font-medium">{ROLE_LABEL[profile.role] ?? profile.role}</div>
           </div>
           <div>
-            <div className="text-xs text-[#8B93A7]">Username</div>
-            <div className="text-[#E7E4DC]">{profile.username}</div>
+            <div className="text-xs text-muted">Username</div>
+            <div className="text-ink font-medium">{profile.username}</div>
           </div>
           <div>
-            <div className="text-xs text-[#8B93A7]">Member since</div>
-            <div className="text-[#E7E4DC]">{formatDate(profile.date_joined)}</div>
+            <div className="text-xs text-muted">Member since</div>
+            <div className="text-ink font-medium">{formatDate(profile.date_joined)}</div>
           </div>
         </div>
       </div>

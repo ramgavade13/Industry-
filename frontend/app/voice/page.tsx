@@ -157,32 +157,38 @@ export default function VoicePage() {
         <button
           onClick={status === "listening" ? undefined : startListening}
           disabled={status === "unsupported" || status === "thinking"}
-          className={`w-24 h-24 rounded-full flex items-center justify-center text-2xl font-semibold transition-colors ${
+          aria-label="Ask by voice"
+          className={`w-24 h-24 rounded-full flex items-center justify-center text-2xl font-semibold transition-all focus:outline-none focus:ring-4 focus:ring-brand/30 ${
             status === "listening"
-              ? "bg-[#D65F5F] text-white animate-pulse"
-              : "bg-[#C9A227] text-[#0F1420] hover:bg-[#DDB646]"
+              ? "bg-danger-subtle text-danger border-2 border-danger-border shadow-raised animate-pulse"
+              : status === "speaking"
+                ? "bg-brand-subtle text-ink border-2 border-brand shadow-raised"
+                : "btn-brand shadow-raised"
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           🎙
         </button>
 
-        <p className="mt-4 text-sm text-[#8B93A7]">{statusLabel[status]}</p>
+        <p className="mt-4 text-sm font-medium text-muted">{statusLabel[status]}</p>
 
         {(status === "speaking" || status === "thinking") && (
-          <button onClick={stopAll} className="mt-2 text-xs text-[#8B93A7] hover:text-[#D65F5F] transition-colors underline">
+          <button
+            onClick={stopAll}
+            className="mt-2 text-xs text-muted hover:text-danger transition-colors underline focus:outline-none focus:ring-2 focus:ring-brand/20 rounded"
+          >
             Stop
           </button>
         )}
 
         {transcript && status !== "idle" && (
-          <div className="mt-6 max-w-md text-center text-sm text-[#E7E4DC] bg-[#161C2C] border border-[#242B3D] rounded-lg px-4 py-3">
+          <div className="card mt-6 max-w-md text-center text-sm text-ink px-4 py-3">
             &ldquo;{transcript}&rdquo;
           </div>
         )}
 
         <div className="mt-10 w-full max-w-2xl space-y-4">
           {turns.length === 0 && status !== "unsupported" && hints.length > 0 && (
-            <p className="text-center text-xs text-[#5C6580]">
+            <p className="text-center text-xs text-muted">
               Try: {hints.map((h, i) => (
                 <span key={h}>
                   {i > 0 && " or "}
@@ -192,11 +198,11 @@ export default function VoicePage() {
             </p>
           )}
           {[...turns].reverse().map((t) => (
-            <div key={t.id} className="bg-[#161C2C] border border-[#242B3D] rounded-lg px-5 py-4">
-              <div className="text-xs text-[#C9A227] font-medium">You asked</div>
-              <p className="text-sm text-[#E7E4DC] mt-1">{t.question}</p>
-              <div className="text-xs text-[#C9A227] font-medium mt-3">Assistant</div>
-              <p className="text-sm text-[#8B93A7] mt-1 whitespace-pre-line leading-6">{t.answer}</p>
+            <div key={t.id} className="card px-5 py-4">
+              <div className="text-xs text-brand font-semibold uppercase tracking-wide">You asked</div>
+              <p className="text-sm text-ink mt-1">{t.question}</p>
+              <div className="text-xs text-brand font-semibold uppercase tracking-wide mt-3">Assistant</div>
+              <p className="text-sm text-muted mt-1 whitespace-pre-line leading-6">{t.answer}</p>
             </div>
           ))}
         </div>

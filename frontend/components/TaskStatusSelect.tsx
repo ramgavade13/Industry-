@@ -1,7 +1,14 @@
 "use client";
 
 import { useTransition } from "react";
-import { STATUS_OPTIONS, statusColor } from "@/lib/taskStyles";
+import { STATUS_OPTIONS } from "@/lib/taskStyles";
+
+const statusBadgeStyles: Record<string, string> = {
+  Completed: "bg-success-subtle text-success border-success-border",
+  "In Progress": "bg-secondary-subtle text-secondary border-secondary/30",
+  "Not Started": "bg-slate-100 text-slate-700 border-slate-300",
+  Delayed: "bg-danger-subtle text-danger border-danger-border",
+};
 
 export default function TaskStatusSelect({
   id,
@@ -23,12 +30,12 @@ export default function TaskStatusSelect({
         const next = e.target.value;
         startTransition(() => action(id, next));
       }}
-      className={`bg-[#0F1420] border border-[#242B3D] rounded-md px-2 py-1 text-sm font-medium disabled:opacity-60 ${
-        statusColor[status] ?? "text-[#8B93A7]"
+      className={`rounded-lg border px-2.5 py-1 text-xs font-semibold shadow-sm outline-none transition-all focus:ring-2 focus:ring-brand/20 disabled:opacity-60 cursor-pointer ${
+        statusBadgeStyles[status] ?? "bg-surface text-ink border-border"
       }`}
     >
       {STATUS_OPTIONS.map((s) => (
-        <option key={s} value={s}>
+        <option key={s} value={s} className="bg-white text-slate-900">
           {s}
         </option>
       ))}

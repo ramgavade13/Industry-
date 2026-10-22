@@ -22,10 +22,13 @@ export default function UserForm({
   const err = (key: string) => state?.fieldErrors?.[key];
 
   return (
-    <form action={formAction} className="bg-[#161C2C] border border-[#242B3D] rounded-lg p-6 max-w-3xl">
+    <form action={formAction} className="card rounded-2xl p-6 sm:p-8 bg-surface border border-border shadow-card max-w-3xl">
       {state?.error && (
-        <div className="mb-5 rounded-md border border-[#D65F5F]/40 bg-[#D65F5F]/10 px-4 py-3 text-sm text-[#D65F5F]">
-          {state.error}
+        <div className="mb-6 rounded-xl border border-danger-border bg-danger-subtle px-4 py-3 text-sm font-semibold text-danger flex items-center gap-2 shadow-sm">
+          <svg className="w-4 h-4 shrink-0 text-danger" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+          <span>{state.error}</span>
         </div>
       )}
 
@@ -44,7 +47,7 @@ export default function UserForm({
             required
             readOnly={editing}
             defaultValue={val("username", user?.username ?? "")}
-            className={`${inputClass} ${editing ? "opacity-60" : ""}`}
+            className={`${inputClass} ${editing ? "bg-surface-subtle text-muted cursor-not-allowed" : ""}`}
           />
         </Field>
 
@@ -77,26 +80,27 @@ export default function UserForm({
         </Field>
 
         {editing && (
-          <label className="flex items-center gap-2 text-sm text-[#E7E4DC] sm:col-span-2">
+          <label className="flex items-center gap-2.5 text-sm font-semibold text-ink sm:col-span-2 pt-2">
             <input
               name="is_active"
               type="checkbox"
               defaultChecked={val("is_active", user?.is_active ? "on" : "off") === "on"}
+              className="w-4 h-4 rounded text-brand focus:ring-brand border-border"
             />
-            Account is active (untick to deactivate this user)
+            <span>Account is active (untick to deactivate this user)</span>
           </label>
         )}
       </div>
 
-      <div className="flex items-center gap-4 mt-6">
+      <div className="flex items-center gap-4 mt-8 pt-4 border-t border-border">
         <button
           type="submit"
           disabled={pending}
-          className="bg-[#C9A227] text-[#0F1420] rounded-md px-5 py-2 text-sm font-medium disabled:opacity-60"
+          className="btn-brand rounded-xl px-6 py-2.5 text-sm font-semibold shadow-sm transition-all disabled:opacity-60"
         >
           {pending ? "Saving..." : submitLabel}
         </button>
-        <Link href="/dashboard/admin" className="text-sm text-[#8B93A7] hover:text-[#E7E4DC]">
+        <Link href="/dashboard/admin" className="text-sm font-semibold text-muted hover:text-ink transition-colors">
           Cancel
         </Link>
       </div>

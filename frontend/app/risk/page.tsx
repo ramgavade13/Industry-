@@ -2,10 +2,11 @@ import DashboardLayout from "@/components/DashboardLayout";
 import KPICard from "@/components/KPICard";
 import { fetchRiskDetails } from "@/lib/api";
 
+// Maps severity to badge utility classes from globals.css
 const badge: Record<string, string> = {
-  high: "bg-[#D65F5F]/15 text-[#D65F5F] border-[#D65F5F]/40",
-  medium: "bg-[#C9A227]/15 text-[#C9A227] border-[#C9A227]/40",
-  low: "bg-[#3FA77C]/15 text-[#3FA77C] border-[#3FA77C]/40",
+  high: "badge-high",
+  medium: "badge-medium",
+  low: "badge-low",
 };
 
 function pct(value: number | null) {
@@ -35,57 +36,59 @@ export default async function RiskPage() {
         />
       </div>
 
-      <div className="bg-[#161C2C] border border-[#242B3D] rounded-lg mt-6 overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#242B3D]">
-          <h3 className="text-sm font-semibold text-[#E7E4DC]">Projects needing attention</h3>
+      <div className="card rounded-xl mt-6 overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
+          <h3 className="text-sm font-semibold text-ink">Projects needing attention</h3>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs text-[#8B93A7] border-b border-[#242B3D]">
-              <th className="px-5 py-3 font-medium">Project</th>
-              <th className="px-5 py-3 font-medium">Risk</th>
-              <th className="px-5 py-3 font-medium">Score</th>
-              <th className="px-5 py-3 font-medium">Progress</th>
-              <th className="px-5 py-3 font-medium">Budget used</th>
-              <th className="px-5 py-3 font-medium">Why</th>
-            </tr>
-          </thead>
-          <tbody>
-            {risks.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-5 py-6 text-center text-[#8B93A7]">
-                  No risky projects right now. Run the AI analysis to refresh.
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-muted border-b border-border bg-surface-subtle">
+                <th className="px-5 py-3 font-semibold">Project</th>
+                <th className="px-5 py-3 font-semibold">Risk</th>
+                <th className="px-5 py-3 font-semibold">Score</th>
+                <th className="px-5 py-3 font-semibold">Progress</th>
+                <th className="px-5 py-3 font-semibold">Budget used</th>
+                <th className="px-5 py-3 font-semibold">Why</th>
               </tr>
-            )}
-            {risks.map((r) => (
-              <tr key={r.project} className="border-b border-[#242B3D] last:border-0 align-top">
-                <td className="px-5 py-3 text-[#E7E4DC]">{r.project}</td>
-                <td className="px-5 py-3">
-                  <span
-                    className={`inline-block rounded border px-2 py-0.5 text-xs uppercase ${
-                      badge[r.severity] ?? badge.low
+            </thead>
+            <tbody>
+              {risks.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-8 text-center text-muted">
+                    No risky projects right now. Run the AI analysis to refresh.
+                  </td>
+                </tr>
+              )}
+              {risks.map((r) => (
+                <tr key={r.project} className="border-b border-border last:border-0 align-top hover:bg-surface-subtle transition-colors">
+                  <td className="px-5 py-3 text-ink font-medium">{r.project}</td>
+                  <td className="px-5 py-3">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border ${
+                        badge[r.severity] ?? badge.low
+                      }`}
+                    >
+                      {r.severity.charAt(0).toUpperCase() + r.severity.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3 text-ink font-semibold tabular-nums">{r.score ?? "-"}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums">{pct(r.progress)}</td>
+                  <td
+                    className={`px-5 py-3 tabular-nums font-medium ${
+                      r.budget_used_pct !== null && r.budget_used_pct > 100
+                        ? "text-danger"
+                        : "text-muted"
                     }`}
                   >
-                    {r.severity}
-                  </span>
-                </td>
-                <td className="px-5 py-3 text-[#E7E4DC]">{r.score ?? "-"}</td>
-                <td className="px-5 py-3 text-[#8B93A7]">{pct(r.progress)}</td>
-                <td
-                  className={`px-5 py-3 ${
-                    r.budget_used_pct !== null && r.budget_used_pct > 100
-                      ? "text-[#D65F5F]"
-                      : "text-[#8B93A7]"
-                  }`}
-                >
-                  {pct(r.budget_used_pct)}
-                </td>
-                <td className="px-5 py-3 text-[#8B93A7]">{r.risk}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    {pct(r.budget_used_pct)}
+                  </td>
+                  <td className="px-5 py-3 text-muted">{r.risk}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </DashboardLayout>
   );

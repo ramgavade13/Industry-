@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import "@fontsource-variable/plus-jakarta-sans";
+import "@fontsource-variable/inter";
 import "./globals.css";
 import BusinessScene from "@/components/three/BusinessScene";
 import SessionKeeper from "@/components/SessionKeeper";
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="text-[#E7E4DC]">
+      <body className="font-sans antialiased text-ink">
         {/* keeps the login session alive by renewing the access token quietly */}
         <SessionKeeper />
         {/* one shared 3D background behind every page */}
