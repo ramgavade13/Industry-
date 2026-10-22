@@ -103,6 +103,16 @@ All demo accounts use the password `Demo@1234` (capital D).
 - **Users:** admins add and edit users; everyone has a profile page and can change their
   password.
 
+## AI module (`ai/`)
+
+The `ai/` folder is a separate Python module with the AI work behind the project: AI agents
+(financial, risk, productivity, recommendations, executive), forecasting, a trained risk
+model, document Q&A (RAG) and a voice assistant, plus a small FastAPI service.
+
+The web app above does not need this module to run. Its dashboards, risk scores, forecasts,
+chat and voice all work from the Django backend. See `ai/README.md` for the folder structure
+and the libraries it uses.
+
 ## Running the tests
 
 ```powershell
