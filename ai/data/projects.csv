@@ -1,0 +1,16 @@
+project_id,project_name,team,budget,actual_cost,progress,deadline_days,team_size,status
+P001,CRM System,Platform,500000,420000,78,20,8,In Progress
+P002,Mobile App v2,Mobile,300000,114000,45,35,5,In Progress
+P003,AI Platform,AI,800000,500000,40,60,10,In Progress
+P004,Client Portal Revamp,Web,450000,414000,70,12,6,In Progress
+P005,Inventory Sync API,Backend,220000,198000,55,9,4,In Progress
+P006,HR Self-Service Portal,Web,180000,90000,50,40,3,In Progress
+P007,Payment Gateway Upgrade,Backend,350000,340000,88,15,5,In Progress
+P008,Analytics Dashboard v1,Platform,260000,255000,95,5,4,In Progress
+P009,Vendor Management Tool,Web,150000,60000,35,50,3,In Progress
+P010,Data Warehouse Migration,Backend,600000,610000,65,18,7,In Progress
+P011,Marketing Automation,Mobile,210000,80000,30,45,4,In Progress
+P012,Security Audit Remediation,Platform,120000,115000,80,7,3,In Progress
+P013,Employee Wellness App,Mobile,140000,50000,25,55,3,In Progress
+P014,Legacy System Decommission,Backend,90000,88000,92,4,2,In Progress
+P015,Customer Feedback Hub,Web,170000,70000,48,30,4,In Progress

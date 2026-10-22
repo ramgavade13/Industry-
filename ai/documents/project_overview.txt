@@ -1,0 +1,5 @@
+AI Executive Decision Agent
+
+The project analyzes financial performance, project risks, and employee task productivity. It combines these analyses to provide executive decision support and recommendations.
+
+Project managers should review high-risk projects, monitor spending against budgets, and investigate overdue tasks before making important decisions.
